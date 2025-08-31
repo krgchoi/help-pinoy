@@ -1,0 +1,140 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.navbar {
+  background-color: #ffffff;
+  opacity: 0.95;
+  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand img {
+  height: 50px;
+}
+
+.navbar-nav .nav-link {
+  color: #007bff;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #0056b3;
+}
+
+
+
+.donate-btn {
+  background-color: #ff4b4b;
+  color: rgb(69, 72, 255);
+  font-weight: bold;
+  border-radius: 20px;
+  padding: 5px 15px;
+  transition: all 0.3s ease;
+}
+
+.donate-btn:hover {
+  background-color: #cc0000;
+}
+
+.offcanvas {
+  background-color: #f8f9fa;
+}
+
+.offcanvas .nav-link {
+  color: #009fe3;
+  font-size: 18px;
+}
+
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  position: relative;
+  z-index: 1;
+  padding: 60px 20px;
+  background-color: transparent;
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: -1;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-header {
+  font-size: 1.25rem;
+  font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.map-index {
+  width: 100%;
+  height: 400px;
+  background: #ccc;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.content-section {
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+
+.content-section h2 {
+  margin-bottom: 30px;
+}
+
+.tight-space {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.text-muted {
+  font-size: 0.9rem;
+}
