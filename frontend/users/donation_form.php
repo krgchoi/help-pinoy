@@ -335,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (currentStep === 1) {
                 const anonymous = document.getElementById('anonymous').checked;
                 if (!anonymous) {
-                    // Validate required fields if not anonymous
                     const fullName = document.getElementById('full_name').value.trim();
                     const email = document.getElementById('email').value.trim();
                     const contact = document.getElementById('contact_number').value.trim();

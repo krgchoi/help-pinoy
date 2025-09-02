@@ -125,7 +125,7 @@ def create_donation():
         "payer_email": email,
         "description": f"Donation from {full_name}",
         "amount": float(amount),
-        "success_redirect_url": "https://92ace998c13d.ngrok-free.app/help_pinoy/frontend/users/thank_you.php",
+        "success_redirect_url": "localhost/help_pinoy/frontend/users/thank_you.php",
     }
 
     XENDIT_APIKEY = os.getenv('XENDIT_APIKEY')
@@ -140,8 +140,9 @@ def create_donation():
         return jsonify({"error": "Xendit invoice failed"}), 400
 
     invoice = xendit_response.json()
-
-    payment_status = invoice.get('status', 'PENDING')
+    print("Xendit invoice created:", invoice)
+    invouice_url = invoice.get('invoice_url')
+    payment_status = invoice.get('status')
     payment_method = invoice.get('payment_channel', 'Xendit')
     xendit_payment_id = invoice['id']
     donation_date = datetime.datetime.now()
@@ -154,13 +155,13 @@ def create_donation():
     cursor = conn.cursor()
     if donor_id:
         cursor.execute(
-            "INSERT INTO donations (donor_id, full_name, email, contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (donor_id, encrypted_full_name, encrypted_email, encrypted_contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date)
+            "INSERT INTO donations (donor_id, full_name, email, contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date, invoice_url) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (donor_id, encrypted_full_name, encrypted_email, encrypted_contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date, invouice_url)
         )
     else:
         cursor.execute(
-            "INSERT INTO donations (full_name, email, contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (encrypted_full_name, encrypted_email, encrypted_contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date)
+            "INSERT INTO donations (full_name, email, contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date, invoice_url) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (encrypted_full_name, encrypted_email, encrypted_contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date, invouice_url)
         )
     conn.commit()
     cursor.close()

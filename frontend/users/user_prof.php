@@ -167,31 +167,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
             <th>Amount</th>
             <th>Donation Status</th>
             <th>Donation Date</th>
-            <th>Donation Details</th>
+            <th>Details</th>
         </tr>
-        <?php foreach ($donations as $donation): ?>
-            <tr>
-                <td>
-                    <span><?php echo htmlspecialchars($donation['receipt_no'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
-                </td>
-                <td>
-                    <span>₱<?php echo htmlspecialchars($donation['amount'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
-                </td>
-                <td>
-                    <span><?php echo htmlspecialchars($donation['status'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
-                </td>
-                <td>
-                    <span><?php echo htmlspecialchars($donation['date'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
-                </td>
-                <td>
-                    <form method="POST" action="donation_details.php">
-                        <input type="hidden" value="<?php echo htmlspecialchars($donation['status'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" name="donation_status">
-                        <input type="hidden" value="<?php echo htmlspecialchars($donation['id'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" name="donation_id">
-                        <input type="submit" value="details" class="btn donation-details-btn" name="donation_details_btn">
-                    </form>
-                </td>
-            </tr>
-        <?php endforeach; ?>
+            <?php foreach ($donations as $donation): ?>
+                <tr>
+                    <td>
+                        <span><?php echo htmlspecialchars($donation['receipt_no'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                    </td>
+                    <td>
+                        <span>₱<?php echo htmlspecialchars($donation['amount'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                    </td>
+                    <td>
+                        <span><?php echo htmlspecialchars($donation['status'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                    </td>
+                    <td>
+                        <span><?php echo htmlspecialchars($donation['date'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                    </td>
+                    <td>
+                        <?php if (strtolower($donation['status']) === 'paid' && !empty($donation['blockchain_tx'])): ?>
+                            <a href="https://sepolia.etherscan.io/tx/<?php echo urlencode($donation['blockchain_tx']); ?>" target="_blank">View on Blockchain</a>
+                        <?php elseif (strtolower($donation['status']) === 'pending' && !empty($donation['invoice_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($donation['invoice_url'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" >Complete Payment</a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
     </table>
 </section>
 

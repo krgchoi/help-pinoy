@@ -71,7 +71,7 @@ def verify_admin_otp():
         return jsonify({'status': 'error', 'message': 'OTP expired'})
 
     token = jwt.encode(
-        {'id': admin_id, 'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)},
+        {'id': admin_id, 'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5)},
         current_app.config['SECRET_KEY']
     )
 

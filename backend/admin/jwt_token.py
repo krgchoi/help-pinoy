@@ -8,7 +8,7 @@ def verify_token(f):
     def decorated(*args, **kwargs):
         token = request.headers.get('get-token')
         if not token:
-            return jsonify({'status': 'error', 'message': 'Token Missing'}), 401
+            return jsonify({'status': 'error', 'message': 'Token Missing'}),
         try:
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
             conn = db_conn()

@@ -66,12 +66,12 @@ $jwt_token = $_SESSION['jwt_token'];
                         <span>News</span>
                     </a>
                 </li>
-                <!-- <li class="sidebar-item">
+                <li class="sidebar-item">
                     <a href="location.php" class="sidebar-link">
                         <i class="bi bi-geo-alt"></i>
                         <span>Centers</span>
                     </a>
-                </li> -->
+                </li>
                 <!-- <li class="sidebar-item">
                     <a href="report.php" class="sidebar-link">
                         <i class="lni lni-file-pencil"></i>

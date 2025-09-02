@@ -39,7 +39,7 @@ def user_profile():
         }
 
     cursor.execute(
-        "SELECT donation_id, full_name, email, contact_number, amount, payment_status, payment_method, xendit_payment_id, donation_date, receipt_url FROM donations WHERE donor_id = %s ORDER BY donation_date DESC",
+        "SELECT donation_id, full_name, email, contact_number, amount, payment_status, payment_method, xendit_payment_id, donation_date, receipt_url, invoice_url, blockchain_tx FROM donations WHERE donor_id = %s ORDER BY donation_date DESC",
         (user_id,)
     )
     donations = []
@@ -66,7 +66,9 @@ def user_profile():
             'payment_method': row['payment_method'],
             'receipt_no': row['xendit_payment_id'],
             'date': row['donation_date'].strftime('%Y-%m-%d %H:%M:%S') if row['donation_date'] else '',
-            'receipt_url': row['receipt_url']
+            'receipt_url': row['receipt_url'],
+            'invoice_url': row.get('invoice_url', None),
+            'blockchain_tx': row.get('blockchain_tx', None)
         })
 
     cursor.close()

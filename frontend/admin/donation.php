@@ -19,7 +19,7 @@ if (isset($data['status']) && $data['status'] === 'expire') {
     exit();
 }
 
-$donations = $data; // Decrypted data is already received from the API
+$donations = $data;
 ?>
 <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search Donation...">
 
@@ -114,7 +114,6 @@ $donations = $data; // Decrypted data is already received from the API
         });
     });
 
-    // Pagination logic
     function paginateTable(tableId, paginationId, rowsPerPage = 10) {
         const table = document.getElementById(tableId);
         const tbody = table.querySelector('tbody');
