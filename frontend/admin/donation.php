@@ -1,6 +1,8 @@
 <?php
 include('./template/head.php');
 
+$jwt_token = $_SESSION['jwt_token'];
+
 $url = "http://localhost:5000/admin/donations";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -21,79 +23,139 @@ if (isset($data['status']) && $data['status'] === 'expire') {
 
 $donations = $data;
 ?>
-<input type="text" id="searchInput" class="form-control mb-3" placeholder="Search Donation...">
 
-<div class="container">
-    <h2>Manage Donations</h2>
-    <table class="table table-striped" id="donationTable">
-        <thead>
-            <tr>
-                <th>Donation ID</th>
-                <th>Amount</th>
-                <th>Donor Name</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($donations)): ?>
-                <?php foreach ($donations as $donation): ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+<style>
+    .search-wrapper {
+        position: relative;
+        max-width: 400px;
+        margin-bottom: 20px;
+    }
+    .search-wrapper .bi-search {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+    #searchInput {
+        padding-left: 40px;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .modal-header {
+        background-color: #f1f1f1;
+    }
+    .badge-status {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="bi bi-gift-fill text-primary"></i> Manage Donations</h2>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-wrapper">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by Donation ID or Donor Name...">
+    </div>
+
+    <!-- Donations Table -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped table-hover align-middle" id="donationTable">
+                <thead class="table-light">
                     <tr>
-                        <td><?php echo htmlspecialchars($donation['xendit_payment_id'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td>₱ <?php echo htmlspecialchars(number_format($donation['amount'], 2, '.', ','), ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars($donation['full_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td>
-                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#donationModal<?php echo htmlspecialchars($donation['donation_id'], ENT_QUOTES, 'UTF-8'); ?>" title="View">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </td>
+                        <th>Donation ID</th>
+                        <th>Amount</th>
+                        <th>Donor Name</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($donations)): ?>
+                        <?php foreach ($donations as $donation): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($donation['xendit_payment_id']); ?></td>
+                                <td><strong>₱ <?php echo number_format($donation['amount'], 2, '.', ','); ?></strong></td>
+                                <td><?php echo htmlspecialchars($donation['full_name']); ?></td>
+                                <td>
+                                    <span class="badge badge-status bg-<?php
+                                        echo $donation['payment_status'] === 'PAID' ? 'success' :
+                                            ($donation['payment_status'] === 'PENDING' ? 'warning text-dark' : 'secondary');
+                                    ?>">
+                                        <?php echo htmlspecialchars($donation['payment_status']); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#donationModal<?php echo htmlspecialchars($donation['donation_id']); ?>"
+                                            title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
 
-                    <!-- Modal -->
-                    <div class="modal fade" id="donationModal<?php echo htmlspecialchars($donation['donation_id'], ENT_QUOTES, 'UTF-8'); ?>" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">
-                                        Donation Details - <?php echo htmlspecialchars($donation['full_name'], ENT_QUOTES, 'UTF-8'); ?>
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p><strong>Donation ID:</strong> <?php echo htmlspecialchars($donation['donation_id'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Donor Name:</strong> <?php echo htmlspecialchars($donation['full_name'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Email:</strong> <?php echo htmlspecialchars($donation['email'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Contact Number:</strong> <?php echo htmlspecialchars($donation['contact_number'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Birthday:</strong> <?php echo $donation['birthday'] ? htmlspecialchars(date('F j, Y', strtotime($donation['birthday'])), ENT_QUOTES, 'UTF-8') : 'N/A'; ?></p>
-                                    <p><strong>Amount:</strong> ₱ <?php echo htmlspecialchars(number_format($donation['amount'], 2, '.', ','), ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Payment Status:</strong> <?php echo htmlspecialchars($donation['payment_status'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Payment Method:</strong> <?php echo htmlspecialchars($donation['payment_method'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Paid At:</strong> <?php echo $donation['paid_at'] ? htmlspecialchars(date('F j, Y h:i A', strtotime($donation['paid_at'])), ENT_QUOTES, 'UTF-8') : 'N/A'; ?></p>
-                                    <p><strong>Receipt URL:</strong>
-                                        <?php if ($donation['receipt_url']): ?>
-                                            <a href="<?php echo htmlspecialchars($donation['receipt_url'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank">View Receipt</a>
-                                        <?php else: ?>
-                                            N/A
-                                        <?php endif; ?>
-                                    </p>
-                                    <p><strong>Donation Date:</strong> <?php echo htmlspecialchars(date('F j, Y h:i A', strtotime($donation['donation_date'])), ENT_QUOTES, 'UTF-8'); ?></p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <!-- Donation Details Modal -->
+                            <div class="modal fade" id="donationModal<?php echo htmlspecialchars($donation['donation_id']); ?>" tabindex="-1">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title"><i class="bi bi-info-circle-fill text-primary"></i> Donation Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <p><strong>Donation ID:</strong> <?php echo htmlspecialchars($donation['donation_id']); ?></p>
+                                                    <p><strong>Donor Name:</strong> <?php echo htmlspecialchars($donation['full_name']); ?></p>
+                                                    <p><strong>Email:</strong> <?php echo htmlspecialchars($donation['email']); ?></p>
+                                                    <p><strong>Contact:</strong> <?php echo htmlspecialchars($donation['contact_number']); ?></p>
+                                                    <p><strong>Birthday:</strong>
+                                                        <?php echo $donation['birthday'] ? htmlspecialchars(date('F j, Y', strtotime($donation['birthday']))) : 'N/A'; ?>
+                                                    </p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p><strong>Amount:</strong> ₱ <?php echo number_format($donation['amount'], 2); ?></p>
+                                                    <p><strong>Status:</strong> <?php echo htmlspecialchars($donation['payment_status']); ?></p>
+                                                    <p><strong>Payment Method:</strong> <?php echo $donation['payment_method'] ?: 'N/A'; ?></p>
+                                                    <p><strong>Paid At:</strong>
+                                                        <?php echo $donation['paid_at'] ? htmlspecialchars(date('F j, Y h:i A', strtotime($donation['paid_at']))) : 'N/A'; ?>
+                                                    </p>
+                                                    <p><strong>Receipt:</strong>
+                                                        <?php if ($donation['receipt_url']): ?>
+                                                            <a href="<?php echo htmlspecialchars($donation['receipt_url']); ?>" target="_blank">View Receipt</a>
+                                                        <?php else: ?> N/A <?php endif; ?>
+                                                    </p>
+                                                    <p><strong>Date Donated:</strong> <?php echo date('F j, Y h:i A', strtotime($donation['donation_date'])); ?></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="4">No donations found.</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-    <nav>
-        <ul class="pagination" id="donationTablePagination"></ul>
-    </nav>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No donations found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center mt-3" id="donationTablePagination"></ul>
+            </nav>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -103,14 +165,10 @@ $donations = $data;
         const rows = document.querySelectorAll('#donationTable tbody tr');
 
         rows.forEach(row => {
-            const recieptNumber = row.children[0].textContent.toLowerCase();
+            const donationId = row.children[0].textContent.toLowerCase();
             const donorName = row.children[2].textContent.toLowerCase();
 
-            if (recieptNumber.includes(filter) || donorName.includes(filter)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+            row.style.display = (donationId.includes(filter) || donorName.includes(filter)) ? '' : 'none';
         });
     });
 
@@ -123,9 +181,7 @@ $donations = $data;
         function showPage(page) {
             const start = (page - 1) * rowsPerPage;
             const end = start + rowsPerPage;
-            rows.forEach((row, i) => {
-                row.style.display = (i >= start && i < end) ? '' : 'none';
-            });
+            rows.forEach((row, i) => row.style.display = (i >= start && i < end) ? '' : 'none');
         }
 
         function renderPagination() {
