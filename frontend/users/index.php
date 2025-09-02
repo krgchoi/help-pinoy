@@ -111,7 +111,6 @@ $centers = json_decode($response, true);
           </div>
         </div>
       </div>
-      
       <div class="col-md-3 mb-4 stats-card">
         <div class="card shadow-sm border-0">
           <div class="card-body">
@@ -155,6 +154,29 @@ $centers = json_decode($response, true);
                 echo '<div class="col-12"><p class="text-center">No Stories available.</p></div>';
             }
             ?>
+        </div>
+    </div>
+</section>
+<!-- Map -->
+<section class="content-section bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4">Our Location</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div id="map" class="map-index" style="height: 400px;"></div>
+                <script>
+                    window.mapConfig = {
+                        centers: <?php echo json_encode($centers); ?>,
+                        enableSearch: false,
+                        enableSort: false,
+                        showUserLocation: false
+                    };
+                </script>
+                <?php include './template/map.php'; ?>
+            </div>
+            <div class="col-md-6 d-flex align-items-center justify-content-center p-3">
+                <a href="./centers.php" class="btn btn-success btn-lg">Find Us</a>
+            </div>
         </div>
     </div>
 </section>

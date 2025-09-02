@@ -238,17 +238,17 @@ ob_end_flush();
                             <div class="mb-3">
                                 <label for="full_name" class="form-label">Full Name</label>
                                 <input type="text" name="full_name" id="full_name" class="form-control"
-                                    value="<?php echo htmlspecialchars($default_full_name); ?>" <?php echo $readonly; ?>>
+                                    value="<?php echo htmlspecialchars($default_full_name); ?>" <?php echo $readonly; ?> required>
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" name="email" id="email" class="form-control"
-                                    value="<?php echo htmlspecialchars($default_email); ?>">
+                                    value="<?php echo htmlspecialchars($default_email); ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label for="contact_number" class="form-label">Contact Number</label>
                                 <input type="text" name="contact_number" id="contact_number" class="form-control"
-                                    value="<?php echo htmlspecialchars($default_contact); ?>">
+                                    value="<?php echo htmlspecialchars($default_contact); ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label for="birthday" class="form-label">Birthday (Optional)</label>
@@ -333,10 +333,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
             if (currentStep === 1) {
+                const anonymous = document.getElementById('anonymous').checked;
+                if (!anonymous) {
+                    // Validate required fields if not anonymous
+                    const fullName = document.getElementById('full_name').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const contact = document.getElementById('contact_number').value.trim();
+                    let errorMsg = '';
+                    if (!fullName) errorMsg += 'Full Name is required.\n';
+                    if (!email) errorMsg += 'Email is required.\n';
+                    if (!contact) errorMsg += 'Contact Number is required.\n';
+                    if (errorMsg) {
+                        alert(errorMsg);
+                        return;
+                    }
+                }
                 const amount = document.getElementById('amount_radio').value === 'custom'
                     ? document.getElementById('amount').value
                     : document.getElementById('amount_radio').value;
-                const anonymous = document.getElementById('anonymous').checked;
                 const name = anonymous ? 'Anonymous Donor' : document.getElementById('full_name').value;
                 const email = anonymous ? 'anonymous@example.com' : document.getElementById('email').value;
 
@@ -373,4 +387,3 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
- 

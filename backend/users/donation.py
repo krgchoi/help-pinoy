@@ -5,13 +5,14 @@ from backend.utils import db_conn, cipher_suite
 import os
 import hashlib
 import json
+from decimal import Decimal
 from web3 import Web3
 
 user_donation_bp = Blueprint('user_donation', __name__)
 
 #START
-SEPOLIA_RPC_URL = os.getenv('SEPOLIA_RPC_URL', 'https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID')
-CONTRACT_ADDRESS = os.getenv('DONATION_CONTRACT_ADDRESS', '0xYourContractAddress')
+SEPOLIA_RPC_URL = os.getenv('SEPOLIA_RPC_URL')
+CONTRACT_ADDRESS = os.getenv('DONATION_CONTRACT_ADDRESS')
 CONTRACT_ABI = [
 	{
 		"inputs": [
@@ -89,7 +90,7 @@ CONTRACT_ABI = [
 
 web3 = Web3(Web3.HTTPProvider(SEPOLIA_RPC_URL))
 contract = web3.eth.contract(address=Web3.to_checksum_address(CONTRACT_ADDRESS), abi=CONTRACT_ABI)
-BLOCKCHAIN_PRIVATE_KEY = os.getenv('BLOCKCHAIN_PRIVATE_KEY', '0xYourPrivateKey') 
+BLOCKCHAIN_PRIVATE_KEY = os.getenv('BLOCKCHAIN_PRIVATE_KEY')
 
 def write_donation_to_blockchain(txid, record_hash):
     account = web3.eth.account.from_key(BLOCKCHAIN_PRIVATE_KEY)
@@ -124,7 +125,7 @@ def create_donation():
         "payer_email": email,
         "description": f"Donation from {full_name}",
         "amount": float(amount),
-        "success_redirect_url": "http://localhost/help_pinoy/frontend/users/thank_you.php",
+        "success_redirect_url": "https://92ace998c13d.ngrok-free.app/help_pinoy/frontend/users/thank_you.php",
     }
 
     XENDIT_APIKEY = os.getenv('XENDIT_APIKEY')
@@ -162,36 +163,8 @@ def create_donation():
             (encrypted_full_name, encrypted_email, encrypted_contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date)
         )
     conn.commit()
-    #START
-    try:
-        data_string = json.dumps({
-			"full_name": full_name,
-			"email": email,
-			"contact_number": contact_number,
-			"birthday": birthday,
-			"amount": amount,
-			"xendit_payment_id": xendit_payment_id,
-			"payment_status": payment_status,
-			"payment_method": payment_method,
-			"donation_date": str(donation_date)
-		}, sort_keys=True)
-        
-        record_hash = hashlib.sha256(data_string.encode()).hexdigest()
-        tx_hash = write_donation_to_blockchain(xendit_payment_id, record_hash)
-        receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
-        if receipt.status == 1:
-            cursor.execute(
-                "UPDATE donations SET blockchain_tx = %s WHERE xendit_payment_id = %s",
-                (tx_hash, xendit_payment_id)
-            )
-            conn.commit()
-        else:
-            print("Blockchain transaction failed: Receipt status 0")
-    except Exception as e:
-        print("Blockchain write failed:", str(e))
     cursor.close()
     conn.close()
-    # END
 
     return jsonify({
         "invoice_url": invoice['invoice_url']
@@ -217,6 +190,80 @@ def xendit_webhook():
         (payment_status, payment_channel, paid_at, receipt_url, xendit_payment_id)
     )
     conn.commit()
+
+    # START
+    if payment_status == "PAID":
+        cursor.execute(
+            "SELECT full_name, email, contact_number, birthday, amount, payment_status, payment_method, donation_date, blockchain_tx FROM donations WHERE xendit_payment_id = %s",
+            (xendit_payment_id,)
+        )
+        row = cursor.fetchone()
+        if row and (not row[-1]):
+            try:
+                full_name = row[0]
+                email = row[1]
+                contact_number = row[2]
+                birthday = row[3]
+                amount = row[4]
+                payment_status_db = row[5]
+                payment_method = row[6]
+                donation_date = row[7]
+                try:
+                    if isinstance(amount, Decimal):
+                        amount = float(amount)
+                except Exception:
+                    pass
+                try:
+                    if hasattr(donation_date, 'isoformat'):
+                        donation_date = donation_date.isoformat()
+                except Exception:
+                    donation_date = str(donation_date)
+                try:
+                    if hasattr(birthday, 'isoformat'):
+                        birthday = birthday.isoformat()
+                except Exception:
+                    birthday = str(birthday)
+                try:
+                    full_name = cipher_suite.decrypt(full_name.encode()).decode()
+                except Exception: pass
+                try:
+                    email = cipher_suite.decrypt(email.encode()).decode()
+                except Exception: pass
+                try:
+                    contact_number = cipher_suite.decrypt(contact_number.encode()).decode()
+                except Exception: pass
+
+                data_string = json.dumps({
+                    "full_name": full_name,
+                    "email": email,
+                    "contact_number": contact_number,
+                    "birthday": birthday,
+                    "amount": amount,
+                    "xendit_payment_id": xendit_payment_id,
+                    "payment_status": payment_status_db,
+                    "payment_method": payment_method,
+                    "donation_date": donation_date
+                }, sort_keys=True)
+                record_hash = hashlib.sha256(data_string.encode()).hexdigest()
+                tx_hash = write_donation_to_blockchain(xendit_payment_id, record_hash)
+                print("Blockchain TX Hash:", tx_hash) 
+                receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+                print("Blockchain TX Receipt:", receipt)  
+                if receipt.status == 1:
+                    cursor.execute(
+                        "UPDATE donations SET blockchain_tx = %s WHERE xendit_payment_id = %s",
+                        (tx_hash, xendit_payment_id)
+                    )
+                    conn.commit()
+                    print("blockchain_tx updated in DB")  
+                else:
+                    print("Blockchain transaction failed: Receipt status 0")
+            except Exception as e:
+                print("Blockchain write failed:", str(e))
+        else:
+            print("blockchain_tx already set or donation not found") 
+    # END
+
     cursor.close()
     conn.close()
 
