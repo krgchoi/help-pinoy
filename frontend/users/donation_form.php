@@ -98,13 +98,15 @@ ob_end_flush();
 <style>
     body {
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-                    url('../assets/img/donation-banner.jpg') no-repeat center center fixed;
+                    url('../assets/img/donation-banner2.jpg') no-repeat center center fixed;
         background-size: cover;
         font-family: 'Roboto', sans-serif;
+        color: #333;
     }
 
     .transparent-navbar {
         background-color: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(6px);
     }
     .transparent-navbar .nav-link,
     .transparent-navbar .navbar-brand,
@@ -113,7 +115,8 @@ ob_end_flush();
     }
 
     .donation-container {
-        margin-top: 80px;
+        margin-top: 120px;
+        margin-bottom: 50px;
     }
 
     .donation-form-box {
@@ -135,8 +138,9 @@ ob_end_flush();
         color: #6c757d;
         font-weight: 500;
         position: relative;
+        cursor: pointer;
     }
-    .progress-steps .active {
+    .progress-steps div.active {
         color: #198754;
         font-weight: 700;
     }
@@ -170,21 +174,12 @@ ob_end_flush();
         font-size: 16px;
         margin-bottom: 10px;
     }
-
-    .progress-steps div {
-        flex: 1;
-        text-align: center;
-        color: #6c757d;
-        font-weight: 500;
-        cursor: pointer;
-    }
-    .progress-steps div.active {
-        color: #198754;
-        font-weight: 700;
+    .text-muted {
+        font-size: 0.9rem;
     }
 </style>
 
-<div class="container donation-container mb-5">
+<div class="container donation-container">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="donation-form-box">
@@ -221,8 +216,8 @@ ob_end_flush();
                             <div class="col-6"><button type="button" class="btn btn-outline-primary amount-btn" data-amount="500">₱500</button></div>
                             <div class="col-12"><button type="button" class="btn btn-outline-primary amount-btn other">Other Amount</button></div>
                         </div>
-                            <input type="number" name="amount" id="amount" class="form-control mt-2 d-none" placeholder="Enter custom amount" min="1">
-                            <input type="hidden" name="amount_radio" id="amount_radio">
+                        <input type="number" name="amount" id="amount" class="form-control mt-2 d-none" placeholder="Enter custom amount" min="1">
+                        <input type="hidden" name="amount_radio" id="amount_radio">
                         <div class="text-end mt-4">
                             <button type="button" class="btn btn-success next-step">Continue</button>
                         </div>

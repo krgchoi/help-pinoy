@@ -9,7 +9,7 @@ curl_close($ch);
 $centers = json_decode($response, true);
 
 ?>
-<div class="container my-4">
+<div class="container my-4 min-vh-100" style="padding-top: 120px;">
     <h2 class="text-center">Donation Centers</h2>
     <div class="row">
         <div class="col-md-5 d-flex flex-column">

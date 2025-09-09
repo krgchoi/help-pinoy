@@ -125,7 +125,7 @@ def create_donation():
         "payer_email": email,
         "description": f"Donation from {full_name}",
         "amount": float(amount),
-        "success_redirect_url": "localhost/help_pinoy/frontend/users/thank_you.php",
+        "success_redirect_url": "https://abaa2ab6426d.ngrok-free.app/help_pinoy/frontend/users/thank_you.php",
     }
 
     XENDIT_APIKEY = os.getenv('XENDIT_APIKEY')
@@ -140,7 +140,6 @@ def create_donation():
         return jsonify({"error": "Xendit invoice failed"}), 400
 
     invoice = xendit_response.json()
-    print("Xendit invoice created:", invoice)
     invouice_url = invoice.get('invoice_url')
     payment_status = invoice.get('status')
     payment_method = invoice.get('payment_channel', 'Xendit')

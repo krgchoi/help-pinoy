@@ -8,7 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($email && $password) {
         if (isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
             $recaptcha = $_POST['g-recaptcha-response'];
-            $secretKey = '6LcWT_gqAAAAABhxRTWdczeUyI1SsLKSn48aACYx';
+            // $secretKey = '6LcWT_gqAAAAABhxRTWdczeUyI1SsLKSn48aACYx'; // Production key
+            $secretKey = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Test key
 
             $verify = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secretKey . '&response=' . $recaptcha);
             $captchaResponse = json_decode($verify);
@@ -85,7 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <label for="password" class="form-label custom-fl">Password</label>
                         <input type="password" id="password" name="password" class="form-control" required autocomplete="off">
                     </div>
-                    <div class="g-recaptcha" data-sitekey="6LcWT_gqAAAAAF4T9KnGlPJ0aolNshRpCBfAlfXS" data-callback="loginBtn"></div>
+
+                    <!-- <div class="g-recaptcha" data-sitekey="6LcWT_gqAAAAAF4T9KnGlPJ0aolNshRpCBfAlfXS" data-callback="loginBtn"></div> -->
+                    <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-callback="loginBtn"></div>
 
                     <button type="submit" id="recaptcha" class="btn btn-primary custom-primary py-2 mt-2">Login</button>
                 </form>

@@ -16,8 +16,12 @@
         transform: scale(1.2);
         color: #ffc107 !important;
     }
+    /* make the footer stay at the buttom below the scren*/
+    .footer {
+        flex-shrink: 0;
+    }
+    /* Text to be black */
 </style>
-
 <footer class="footer bg-dark text-white mt-auto">
     <div class="container py-4">
         <div class="row gy-4 align-items-start">

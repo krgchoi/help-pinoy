@@ -34,8 +34,34 @@ if (!$news_item) {
     exit();
 }
 ?>
+<style>
+    .main-navbar .nav-link,
+    .main-navbar .navbar-brand,
+    .main-navbar .btn {
+        color: #222 !important;
+    }
+    .main-navbar .nav-link.active {
+        color: #1976d2 !important;
+    }
+    .main-navbar .nav-link:hover {
+        color: #f39c12 !important;
+    }
+    .transparent-navbar {
+        background-color: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+    }
+    .transparent-navbar .nav-link,
+    .transparent-navbar .navbar-brand,
+    .transparent-navbar .btn {
+        color: black !important;
+    }
+    .text-container {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    }
+</style>
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5 text-container" style="padding-top: 120px; min-height: 70vh;">
     <h2><?php echo htmlspecialchars($news_item['title']); ?></h2>
     <p class="text-muted">By <?php echo htmlspecialchars($news_item['author']); ?> | Published on <?php echo htmlspecialchars($news_item['published_at']); ?></p>
     <?php if (!empty($news_item['image_url'])): ?>

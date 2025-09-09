@@ -25,7 +25,6 @@ if (isset($data['status']) && $data['status'] === 'expire') {
     header('Location: admin_login.php');
     exit();
 }
-
 #add
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_news'])) {
     $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -189,52 +188,98 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
 
 
 ?>
-<input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by title or author...">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<style>
+    .search-wrapper {
+        position: relative;
+        max-width: 400px;
+        margin-bottom: 20px;
+    }
+    .search-wrapper .bi-search {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+    #searchInput {
+        padding-left: 40px;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .badge-category {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+</style>
 
-<div class="container">
-    <h2>Manage News</h2>
-    <a class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addnews">Add News</a>
-    <table class="table table-striped" id="newsTable">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Category</th>
-                <th>Publish</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($data)): ?>
-                <?php foreach ($data as $news): ?>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="bi bi-newspaper text-primary"></i> Manage News</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addnews">
+            <i class="bi bi-plus-circle"></i> Add News
+        </button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrapper">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by Title, Author, or Category...">
+    </div>
+
+    <!-- News Table -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped table-hover align-middle" id="newsTable">
+                <thead class="table-light">
                     <tr>
-                        <td><?php echo htmlspecialchars($news['title'], ENT_QUOTES, 'utf-8'); ?></td>
-                        <td><?php echo htmlspecialchars($news['author'], ENT_QUOTES, 'utf-8'); ?></td>
-                        <td><?php echo htmlspecialchars($news['category'], ENT_QUOTES, 'utf-8'); ?></td>
-                        <td><?php echo htmlspecialchars($news['published_at'], ENT_QUOTES, 'utf-8'); ?></td>
-                        <td>
-                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editnews<?php echo htmlspecialchars($news['news_id'], ENT_QUOTES, 'utf-8'); ?>" title="Edit">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <form method="POST" style="display:inline;">
-                                <input type="hidden" name="news_id" value="<?php echo htmlspecialchars($news['news_id'], ENT_QUOTES, 'UTF-8'); ?>">
-                                <button type="submit" name="delete_news" class="btn btn-danger btn-sm" onclick="return confirm('Delete News?')" title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </td>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Publish Date</th>
+                        <th>Actions</th>
                     </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="5">No news found.</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-    <nav>
-        <ul class="pagination" id="newsTablePagination"></ul>
-    </nav>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data)): ?>
+                        <?php foreach ($data as $news): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($news['title']); ?></td>
+                                <td><?php echo htmlspecialchars($news['author']); ?></td>
+                                <td>
+                                    <span class="badge badge-category bg-info text-dark">
+                                        <?php echo htmlspecialchars($news['category']); ?>
+                                    </span>
+                                </td>
+                                <td><?php echo htmlspecialchars($news['published_at']); ?></td>
+                                <td>
+                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#editnews<?php echo $news['news_id']; ?>" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form method="POST" style="display:inline;">
+                                        <input type="hidden" name="news_id" value="<?php echo htmlspecialchars($news['news_id']); ?>">
+                                        <button type="submit" name="delete_news" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Delete News?')" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No news found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center mt-3" id="newsTablePagination"></ul>
+            </nav>
+        </div>
+    </div>
 </div>
 
 <!-- add news -->

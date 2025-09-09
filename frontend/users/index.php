@@ -19,6 +19,7 @@ curl_close($ch);
 $centers = json_decode($response, true);
 
 ?>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
 <style>
 .hero-section {
     height: 450px;
@@ -74,7 +75,7 @@ $centers = json_decode($response, true);
 }
 </style>
 
-<div class="hero-section" style="background-image: url('../assets/img/donation-banner.jpg');">
+<div class="hero-section" style="background-image: url('../assets/img/donation-banner.jpg');" data-aos="fade-up" data-aos-duration="1000">
     <div class="overlay">
         <div class="hero-content">
             <h1>Day Care Center</h1>
@@ -84,7 +85,7 @@ $centers = json_decode($response, true);
     </div>
 </div>
 
-<section class="py-5 bg-light">
+<!-- <section class="py-5 bg-light">
   <div class="container">
     <div class="row text-center justify-content-center">
       
@@ -125,16 +126,19 @@ $centers = json_decode($response, true);
 
     </div>
   </div>
-</section>
+</section> -->
 
-<section class="content-section bg-white">
+<section class="content-section bg-white" data-aos="fade-up" data-aos-duration="1000">
     <div class="container">
+        <h2 class="text-center mb-4">Latest News</h2>
         <div class="row">
             <?php
             if (is_array($news) && count($news) > 0) {
+                $i = 0;
                 foreach ($news as $news) {
+                    $delay = 100 + ($i * 100);
             ?>
-                    <div class="col-md-4 mb-4">
+                    <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="<?php echo $delay; ?>">
                         <div class="card news-card h-100">
                             <?php if (!empty($news['image_url'])): ?>
                                 <img src="http://localhost:5000/static/news_img/<?php echo htmlspecialchars($news['image_url']); ?>" class="card-img-top" alt="News Image" onerror="this.style.display='none'">
@@ -149,6 +153,7 @@ $centers = json_decode($response, true);
                         </div>
                     </div>
             <?php
+                    $i++;
                 }
             } else {
                 echo '<div class="col-12"><p class="text-center">No Stories available.</p></div>';
@@ -158,7 +163,7 @@ $centers = json_decode($response, true);
     </div>
 </section>
 <!-- Map -->
-<section class="content-section bg-light">
+<section class="content-section bg-light" data-aos="fade-up" data-aos-duration="1000">
     <div class="container">
         <h2 class="text-center mb-4">Our Location</h2>
         <div class="row">
@@ -175,13 +180,15 @@ $centers = json_decode($response, true);
                 <?php include './template/map.php'; ?>
             </div>
             <div class="col-md-6 d-flex align-items-center justify-content-center p-3">
-                <a href="./centers.php" class="btn btn-success btn-lg">Find Us</a>
+                <a href="./centers.php" class="btn btn-success btn-lg">Locate Us</a>
             </div>
         </div>
     </div>
 </section>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
+AOS.init();
 document.addEventListener("DOMContentLoaded", () => {
     const hero = document.querySelector(".hero-section");
     setTimeout(() => hero.classList.add("visible"), 300);

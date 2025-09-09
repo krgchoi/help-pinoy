@@ -144,86 +144,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
     }
 }
 ?>
-<input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by Location Name or Address...">
-<div class="container">
-    <h2>Manage Donation Centers</h2>
-    <a href="#" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addcenters" title="Add">
-        <i class="bi bi-plus"></i>
-    </a>
 
-    <table class="table table-striped" id="locationTable">
-        <thead>
-            <tr>
-                <th>Location Name</th>
-                <th>Address</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($data)): ?>
-                <?php foreach ($data as $location): ?>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold"><i class="bi bi-geo-alt-fill text-primary"></i> Manage Donation Centers</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addcenters">
+            <i class="bi bi-plus"></i> Add Center
+        </button>
+    </div>
+
+    <div class="position-relative mb-3" style="max-width: 400px;">
+        <i class="bi bi-search position-absolute" style="top: 50%; left: 12px; transform: translateY(-50%); color: #6c757d;"></i>
+        <input type="text" id="searchInput" class="form-control ps-5" placeholder="Search by Location Name or Address...">
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0" id="locationTable">
+                <thead class="table-light">
                     <tr>
-                        <td><?php echo htmlspecialchars($location['name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars($location['address'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td>
-                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#locationModal<?php echo $location['id']; ?>" title="View Details">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCenter<?php echo $location['id']; ?>" title="Edit">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <form method="POST" style="display:inline;">
-                                <input type="hidden" name="location_id" value="<?php echo htmlspecialchars($location['id'], ENT_QUOTES, 'UTF-8'); ?>">
-                                <button type="submit" name="delete_center" class="btn btn-danger btn-sm" onclick="return confirm('Delete Center?')" title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </td>
+                        <th>Location Name</th>
+                        <th>Address</th>
+                        <th>Action</th>
                     </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data)): ?>
+                        <?php foreach ($data as $location): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($location['name']); ?></td>
+                                <td><?php echo htmlspecialchars($location['address']); ?></td>
+                                <td class="text-nowrap">
+                                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#locationModal<?php echo $location['id']; ?>" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCenter<?php echo $location['id']; ?>" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form method="POST" style="display:inline;">
+                                        <input type="hidden" name="location_id" value="<?php echo htmlspecialchars($location['id']); ?>">
+                                        <button type="submit" name="delete_center" class="btn btn-danger btn-sm" onclick="return confirm('Delete Center?')" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No locations found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-                    <!-- View Details Modal -->
-                    <div class="modal fade" id="locationModal<?php echo $location['id']; ?>" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Location Details</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p><strong>Name:</strong> <?php echo htmlspecialchars($location['name'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Address:</strong> <?php echo htmlspecialchars($location['address'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Contact Number:</strong> <?php echo htmlspecialchars($location['contact_number'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Email:</strong> <?php echo htmlspecialchars($location['email'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Operating Hours:</strong> <?php echo htmlspecialchars($location['operating_hours'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Type:</strong> <?php echo htmlspecialchars($location['type'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Website URL:</strong>
-                                        <?php if (!empty($location['website_url'])): ?>
-                                            <a href="<?php echo htmlspecialchars($location['website_url'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank">Visit Website</a>
-                                        <?php else: ?>
-                                            N/A
-                                        <?php endif; ?>
-                                    </p>
-                                    <p><strong>Latitude:</strong> <?php echo htmlspecialchars($location['latitude'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p><strong>Longitude:</strong> <?php echo htmlspecialchars($location['longitude'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="3">No data found.</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-    <nav>
-        <ul class="pagination" id="locationTablePagination"></ul>
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center" id="locationTablePagination"></ul>
     </nav>
 </div>
+
 
 <!-- Add Center Modal -->
 <div class="modal fade" id="addcenters" tabindex="-1">
@@ -356,7 +337,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
         });
     });
 
-    // Pagination logic
     function paginateTable(tableId, paginationId, rowsPerPage = 10) {
         const table = document.getElementById(tableId);
         const tbody = table.querySelector('tbody');
