@@ -45,7 +45,7 @@ $result = json_decode($response, true);
     .transparent-navbar .nav-link:hover {
         color: #f39c12 !important;
     }
-    
+
     .news-section {
         min-height: 60vh;
         padding-bottom: 40px;

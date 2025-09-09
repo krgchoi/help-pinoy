@@ -10,7 +10,7 @@ def user_login():
     email = data.get('email')
     password = data.get('password')
     if not email or not password:
-        return jsonify({"status": "fail", "message": "Missing credentials"}), 400
+        return jsonify({"status": "fail", "message": "Missing credentials"}),
 
     try:
         conn = db_conn()
@@ -21,16 +21,16 @@ def user_login():
         cursor.close()
         conn.close()
     except Exception as e:
-        return jsonify({"status": "fail", "message": "Database error"}), 500
+        return jsonify({"status": "fail", "message": "Database error"}),
 
     if not user:
-        return jsonify({"status": "fail", "message": "User not found"}), 404
+        return jsonify({"status": "fail", "message": "User not found"}),
 
     if not check_password_hash(user['password'], password):
-        return jsonify({"status": "fail", "message": "Incorrect password"}), 401
+        return jsonify({"status": "fail", "message": "Incorrect password"}),
 
     if not user['is_verified']:
-        return jsonify({"status": "fail", "message": "Account not verified"}), 403
+        return jsonify({"status": "fail", "message": "Account not verified"}),
 
     return jsonify({
         "status": "success",

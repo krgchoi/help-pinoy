@@ -200,6 +200,7 @@ def xendit_webhook():
         row = cursor.fetchone()
         if row and (not row[-1]):
             try:
+                
                 full_name = row[0]
                 email = row[1]
                 contact_number = row[2]
