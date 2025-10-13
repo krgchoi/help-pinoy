@@ -7,11 +7,12 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help Pinoy - Animal Shelter</title>
+    <title>Help Pinoy - Liga ng mga Barangay</title>
     <link rel="stylesheet" href="../assets/css/users.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <style>
         body {
             margin: 0;
@@ -24,86 +25,91 @@ session_start();
             flex-direction: column;
             justify-content: space-between;
             color: #333;
-
         }
 
-        /* Top Black Bar */
+        /* ---------- TOP BAR ---------- */
         .top-bar {
-            background-color: black;
+            background-color: #003366;
             color: white;
             padding: 8px 20px;
         }
+
         .top-bar .btn {
             margin: 6px 10px;
-            font-size: 16px;
-            padding: 8px 30px;
+            font-size: 15px;
+            padding: 7px 25px;
             font-weight: 600;
+            border-radius: 25px;
         }
-        .top-bar .btn-login, .top-bar .btn-register {
+
+        .top-bar .btn-login,
+        .top-bar .btn-register {
             background: transparent;
             border: 2px solid white;
             color: white;
             font-size: small;
-        }
-        .top-bar .btn-login:hover, .top-bar .btn-register:hover {
-            background: white;
-            color: black;
-        }
-        .top-bar .btn-donate {
-            background: linear-gradient(90deg, #f39c12, #e67e22);
-            border: none;
-            color: white;
-            font-weight: 800;
-            letter-spacing: 2px;
-            font-size: large;
-            
-        }
-        .top-bar .btn-donate:hover {
-            background: #ffc107;
-            color: black;
+            transition: 0.3s;
         }
 
-        /* Main Navbar */
+        .top-bar .btn-login:hover,
+        .top-bar .btn-register:hover {
+            background: white;
+            color: #003366;
+        }
+
+        .top-bar .btn-donate {
+            background: #FFCC00;
+            border: none;
+            color: #003366;
+            font-weight: 800;
+            letter-spacing: 1px;
+            font-size: 16px;
+            transition: 0.3s ease;
+        }
+
+        .top-bar .btn-donate:hover {
+            background: #E6B800;
+            color: #00254d;
+        }
+
+        /* ---------- MAIN NAVBAR ---------- */
         .main-navbar {
-            background: transparent !important;
+            background: rgba(0, 87, 183, 0.85);
             position: absolute;
-            top: 65px; 
+            top: 60px;
             left: 0;
             width: 100%;
             z-index: 999;
-            padding: 15px 30px;
+            padding: 12px 30px;
             transition: background 0.3s ease;
             backdrop-filter: blur(8px);
         }
-       
+
         .main-navbar .nav-link {
-            color: #ffffffff !important;
+            color: white !important;
             font-weight: 600;
             margin-left: 25px;
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 2px;
+            font-size: 17px;
+            letter-spacing: 1px;
             transition: color 0.3s ease;
         }
+
         .main-navbar .nav-link:hover {
-            color: #f39c12 !important;
-        }
-        .navbar-brand img {
-            height: 60px;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.7));
+            color: #FFCC00 !important;
         }
 
-        .navbar-toggler {
-            transition: transform 0.5s ease;
+        .navbar-brand img {
+            height: 60px;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
         }
+
+        /* ---------- RESPONSIVE ---------- */
         @media (max-width: 991px) {
             .main-navbar {
-                background: rgba(0, 0, 0, 0.6) !important;
-                backdrop-filter: blur(8px); 
-                position: fixed; 
-                top: 50px; 
-                padding: 12px 20px ;
-                margin-top: 10px;
+                background: rgba(0, 51, 102, 0.9) !important;
+                position: fixed;
+                top: 50px;
+                padding: 12px 20px;
             }
 
             .main-navbar .nav-link {
@@ -111,12 +117,17 @@ session_start();
             }
         }
 
+        /* ---------- SCROLL EFFECT ---------- */
+        .navbar-scrolled {
+            background: rgba(0, 51, 102, 0.95) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+        }
     </style>
 </head>
 
 <body>
 <div class="wrapper" style="display: flex; flex-direction: column; min-height: 100vh;">
-    <!-- Top Black Bar -->
+    <!-- TOP BAR -->
     <div class="top-bar d-flex justify-content-end align-items-center">
         <?php if (isset($_SESSION['username'])): ?>
             <div class="dropdown">
@@ -140,13 +151,13 @@ session_start();
         <?php endif; ?>
     </div>
 
-    <!-- Main Navbar -->
+    <!-- MAIN NAVBAR -->
     <nav class="navbar navbar-expand-lg main-navbar">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">
                 <img src="../assets/img/hp_logo.png" alt="Help Pinoy Logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -157,37 +168,27 @@ session_start();
                         <a class="nav-link dropdown-toggle<?php if (basename($_SERVER['PHP_SELF']) == 'about.php') echo ' active'; ?>" href="about.php" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             ABOUT
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
+                        <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="about.php">WHO WE ARE</a></li>
                             <li><a class="dropdown-item" href="centers.php">WHERE WE ARE</a></li>
                             <li><a class="dropdown-item" href="about.php#mission">MISSION</a></li>
                         </ul>
                     </li>
-                    <!-- <li class="nav-item"><a class="nav-link<?php if (basename($_SERVER['PHP_SELF']) == 'adopt.php') echo ' active'; ?>" href="adopt.php">ADOPT</a></li>
-                    <li class="nav-item"><a class="nav-link<?php if (basename($_SERVER['PHP_SELF']) == 'volunteer.php') echo ' active'; ?>" href="volunteer.php">GET INVOLVE</a></li> -->
-                    <li class="nav-item"><a class="nav-link<?php if (basename($_SERVER['PHP_SELF']) == 'stories.php') echo ' active'; ?>" href="news.php">STORIES</a></li>
+                    <li class="nav-item"><a class="nav-link<?php if (basename($_SERVER['PHP_SELF']) == 'news.php') echo ' active'; ?>" href="news.php">STORIES</a></li>
                     <li class="nav-item"><a class="nav-link<?php if (basename($_SERVER['PHP_SELF']) == 'contact.php') echo ' active'; ?>" href="contact.php">CONTACT</a></li>
                 </ul>
             </div>
         </div>
     </nav>
+
     <script>
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             const navbar = document.querySelector('.main-navbar');
             if (window.scrollY > 50) {
-                navbar.classList.add('bg-dark', 'shadow');
-                navbar.classList.remove('bg-transparent');
+                navbar.classList.add('navbar-scrolled');
             } else {
-                navbar.classList.remove('bg-dark', 'shadow');
-                navbar.classList.add('bg-transparent');
+                navbar.classList.remove('navbar-scrolled');
             }
         });
-        const toggler = document.querySelector('.navbar-toggler');
-        toggler.addEventListener('click', function() {
-            this.classList.toggle('open');
-        });
     </script>
-<div>
-</body>
-
 

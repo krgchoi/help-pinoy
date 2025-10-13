@@ -1,14 +1,16 @@
-<?php include './template/header.php';
+<?php 
+include './template/header.php';
 
+// Fetch news
 $api_url = 'http://localhost:5000/user/get_news';
 $ch = curl_init($api_url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 $response = curl_exec($ch);
 curl_close($ch);
-
 $news = json_decode($response, true);
 
+// Fetch centers
 $url = "http://localhost:5000/user/user_get_locations";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -17,170 +19,198 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 $response = curl_exec($ch);
 curl_close($ch);
 $centers = json_decode($response, true);
-
 ?>
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
 <style>
+/* ===== Hero Section ===== */
 .hero-section {
-    height: 450px;
-    background-size: cover;
-    background-position: center;
+    height: 100vh;
+    background: url('../assets/img/donation-banner.jpg') center/cover no-repeat;
     position: relative;
-    color: white;
     display: flex;
     align-items: center;
-    opacity: 0;
-    transform: translateY(-30px);
-    transition: all 1s ease;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    overflow: hidden;
 }
-.hero-section.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-.hero-section::before {
-    content: "";
+.hero-overlay {
     position: absolute;
     top: 0;
     left: 0;
-    width: 50%;
+    width: 100%;
     height: 100%;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.6), transparent);
+    background: linear-gradient(to bottom right, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
     z-index: 1;
 }
 .hero-content {
     position: relative;
     z-index: 2;
-    text-align: left;
-    max-width: 500px;
+    max-width: 700px;
+}
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+.hero-content p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+.hero-content .btn-warning {
+    background-color: #ffc107;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: background-color 0.3s;
+}
+.hero-content .btn-warning:hover {
+    background-color: #ffb300;
+}
+
+/* ===== News Section ===== */
+.news-section {
+    padding: 80px 0;
+    background-color: #fff;
+}
+.news-section h2 {
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 50px;
+    color: #333;
+}
+.news-card {
+    transition: all 0.3s ease;
+    border: none;
+    overflow: hidden;
+    border-radius: 12px;
+}
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.news-card img {
+    height: 220px;
+    object-fit: cover;
+}
+.news-card .card-body {
     padding: 20px;
-    margin-left: 50px;
 }
-.overlay {
-    position: relative;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    height: 100%;
-    padding-left: 50px;
+.news-card .card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
 }
-.stats-card {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 1s ease;
+.news-card .card-text {
+    color: #666;
+    font-size: 0.95rem;
+    margin-top: 10px;
+    margin-bottom: 15px;
 }
-.stats-card.visible {
-    opacity: 1;
-    transform: translateY(0);
+.news-card .btn-primary {
+    background-color: #007bff;
+    border: none;
+    font-weight: 600;
+}
+.news-card .btn-primary:hover {
+    background-color: #0069d9;
+}
+
+/* ===== Map Section ===== */
+.map-section {
+    background: #f9fafb;
+    padding: 80px 0;
+}
+.map-section h2 {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 40px;
+    color: #333;
+}
+.map-box {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.locate-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 35px;
+    background-color: #28a745;
+    color: white;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+.locate-btn:hover {
+    background-color: #218838;
 }
 </style>
 
-<div class="hero-section" style="background-image: url('../assets/img/donation-banner.jpg');" data-aos="fade-up" data-aos-duration="1000">
-    <div class="overlay">
-        <div class="hero-content">
-            <h1>Day Care Center</h1>
-            <p>Together, We Shape the Future — Start with a Smile.</p>
-            <a href="donation_form.php" class="btn btn-warning btn-lg px-4 fw-bold">Donate Now</a>
-        </div>
+<!-- Hero Section -->
+<section class="hero-section" data-aos="fade-up" data-aos-duration="1200">
+    <div class="hero-overlay"></div>
+    <div class="hero-content" data-aos="fade-down" data-aos-delay="200">
+        <h1>Together, We Shape the Future</h1>
+        <p>Help build brighter days for children — one smile at a time.</p>
+        <a href="donation_form.php" class="btn btn-warning btn-lg">Donate Now</a>
     </div>
-</div>
+</section>
 
-<!-- <section class="py-5 bg-light">
-  <div class="container">
-    <div class="row text-center justify-content-center">
-      
-      <div class="col-md-3 mb-4 stats-card">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <div class="mb-2">
-              <i class="fas fa-smile text-primary" style="font-size: 2rem;"></i>
-            </div>
-            <h2 class="fw-bold text-primary counter" data-target="152">0</h2>
-            <h5 class="card-title text-muted">Donors</h5>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-md-3 mb-4 stats-card">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <div class="mb-2">
-              <i class="fas fa-hand-holding-heart text-success" style="font-size: 2rem;"></i>
-            </div>
-            <h2 class="fw-bold text-success">₱<span class="counter" data-target="45000">0</span></h2>
-            <h5 class="card-title text-muted">Total Raised</h5>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 mb-4 stats-card">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <div class="mb-2">
-              <i class="fas fa-child text-warning" style="font-size: 2rem;"></i>
-            </div>
-            <h2 class="fw-bold text-warning counter" data-target="24">0</h2>
-            <h5 class="card-title text-muted">Children Supported</h5>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section> -->
-
-<section class="content-section bg-white" data-aos="fade-up" data-aos-duration="1000">
+<!-- News Section -->
+<section class="news-section" data-aos="fade-up" data-aos-duration="1000">
     <div class="container">
-        <h2 class="text-center mb-4">Latest News</h2>
+        <h2>Latest News & Stories</h2>
         <div class="row">
-            <?php
-            if (is_array($news) && count($news) > 0) {
-                $i = 0;
-                foreach ($news as $news) {
-                    $delay = 100 + ($i * 100);
-            ?>
-                    <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="<?php echo $delay; ?>">
+            <?php if (is_array($news) && count($news) > 0): ?>
+                <?php foreach ($news as $index => $item): ?>
+                    <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="<?= 100 + ($index * 100) ?>">
                         <div class="card news-card h-100">
-                            <?php if (!empty($news['image_url'])): ?>
-                                <img src="http://localhost:5000/static/news_img/<?php echo htmlspecialchars($news['image_url']); ?>" class="card-img-top" alt="News Image" onerror="this.style.display='none'">
-                            <?php else: ?>
-                                <img src="../assets/img/default-news.jpg" class="card-img-top" alt="Default News Image">
-                            <?php endif; ?>
+                            <img src="<?= !empty($item['image_url']) 
+                                ? 'http://localhost:5000/static/news_img/' . htmlspecialchars($item['image_url']) 
+                                : '../assets/img/default-news.jpg'; ?>" 
+                                class="card-img-top" alt="News Image" 
+                                onerror="this.src='../assets/img/default-news.jpg'">
                             <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($news['title']); ?></h5>
-                                <p class="card-text"><?php echo htmlspecialchars($news['summary']); ?></p>
-                                <a href="single_news.php?slug=<?php echo urlencode($news['slug']); ?>" class="btn btn-primary">Read More</a>
+                                <h5 class="card-title"><?= htmlspecialchars($item['title']); ?></h5>
+                                <p class="card-text"><?= htmlspecialchars(mb_strimwidth($item['summary'] ?? '', 0, 100, '...')); ?></p>
+                                <a href="single_news.php?slug=<?= urlencode($item['slug']); ?>" class="btn btn-primary">Read More</a>
                             </div>
                         </div>
                     </div>
-            <?php
-                    $i++;
-                }
-            } else {
-                echo '<div class="col-12"><p class="text-center">No Stories available.</p></div>';
-            }
-            ?>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="col-12 text-center text-muted">No stories available at the moment.</div>
+            <?php endif; ?>
         </div>
     </div>
 </section>
-<!-- Map -->
-<section class="content-section bg-light" data-aos="fade-up" data-aos-duration="1000">
+
+<!-- Map Section -->
+<section class="map-section" data-aos="fade-up" data-aos-duration="1000">
     <div class="container">
-        <h2 class="text-center mb-4">Our Location</h2>
-        <div class="row">
-            <div class="col-md-6">
-                <div id="map" class="map-index" style="height: 400px;"></div>
+        <h2>Find Our Nearest Center</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div id="map" class="map-box" style="height: 400px;"></div>
                 <script>
                     window.mapConfig = {
-                        centers: <?php echo json_encode($centers); ?>,
+                        centers: <?= json_encode($centers); ?>,
                         enableSearch: false,
                         enableSort: false,
                         showUserLocation: false
                     };
                 </script>
                 <?php include './template/map.php'; ?>
-            </div>
-            <div class="col-md-6 d-flex align-items-center justify-content-center p-3">
-                <a href="./centers.php" class="btn btn-success btn-lg">Locate Us</a>
+                <div class="text-center">
+                    <a href="./centers.php" class="locate-btn">Locate Us</a>
+                </div>
             </div>
         </div>
     </div>
@@ -188,45 +218,9 @@ $centers = json_decode($response, true);
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
-AOS.init();
-document.addEventListener("DOMContentLoaded", () => {
-    const hero = document.querySelector(".hero-section");
-    setTimeout(() => hero.classList.add("visible"), 300);
-
-    const cards = document.querySelectorAll(".stats-card");
-    const counters = document.querySelectorAll(".counter");
-    const speed = 100;
-
-    const animateCounters = () => {
-        counters.forEach(counter => {
-            const updateCount = () => {
-                const target = +counter.getAttribute("data-target");
-                const count = +counter.innerText;
-                const increment = Math.ceil(target / speed);
-
-                if (count < target) {
-                    counter.innerText = count + increment;
-                    setTimeout(updateCount, 20);
-                } else {
-                    counter.innerText = target.toLocaleString();
-                }
-            };
-            updateCount();
-        });
-    };
-
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
-                if (entry.target === cards[cards.length - 1]) {
-                    animateCounters();
-                }
-            }
-        });
-    }, { threshold: 0.3 });
-
-    cards.forEach(card => observer.observe(card));
+AOS.init({
+    once: true,
+    duration: 1000,
 });
 </script>
 

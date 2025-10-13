@@ -125,7 +125,7 @@ def create_donation():
         "payer_email": email,
         "description": f"Donation from {full_name}",
         "amount": float(amount),
-        "success_redirect_url": "https://abaa2ab6426d.ngrok-free.app/help_pinoy/frontend/users/thank_you.php",
+        "success_redirect_url": "https://localhost/help_pinoy/frontend/users/thank_you.php",
     }
 
     XENDIT_APIKEY = os.getenv('XENDIT_APIKEY')
