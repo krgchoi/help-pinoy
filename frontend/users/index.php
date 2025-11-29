@@ -24,6 +24,11 @@ $centers = json_decode($response, true);
 <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
 
 <style>
+/* ===== General ===== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 /* ===== Hero Section ===== */
 .hero-section {
     height: 100vh;
@@ -32,45 +37,49 @@ $centers = json_decode($response, true);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
     text-align: center;
-    overflow: hidden;
+    color: white;
 }
+
 .hero-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom right, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
-    z-index: 1;
+    inset: 0;
+    background: rgba(0, 30, 70, 0.55);
 }
+
 .hero-content {
     position: relative;
     z-index: 2;
     max-width: 700px;
 }
+
 .hero-content h1 {
-    font-size: 3rem;
+    font-size: 3.2rem;
     font-weight: 700;
-    margin-bottom: 1rem;
-    letter-spacing: 1px;
+    margin-bottom: 1.2rem;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
+
 .hero-content p {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
+    font-size: 1.3rem;
     opacity: 0.9;
+    margin-bottom: 2rem;
 }
+
 .hero-content .btn-warning {
-    background-color: #ffc107;
+    background-color: #FFCC00;
     border: none;
-    padding: 0.75rem 2rem;
-    font-weight: 600;
-    border-radius: 50px;
-    transition: background-color 0.3s;
+    padding: 0.8rem 2.2rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: 40px;
+    letter-spacing: 0.5px;
+    transition: 0.3s ease;
+    color: #003366;
 }
+
 .hero-content .btn-warning:hover {
-    background-color: #ffb300;
+    background-color: #E6B800;
 }
 
 /* ===== News Section ===== */
@@ -78,78 +87,98 @@ $centers = json_decode($response, true);
     padding: 80px 0;
     background-color: #fff;
 }
+
 .news-section h2 {
-    font-weight: 700;
+    font-weight: 800;
     text-align: center;
     margin-bottom: 50px;
-    color: #333;
+    color: #003366;
+    letter-spacing: 1px;
 }
+
 .news-card {
-    transition: all 0.3s ease;
     border: none;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 14px;
+    transition: 0.3s ease;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
 }
+
 .news-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.12);
 }
+
 .news-card img {
     height: 220px;
     object-fit: cover;
 }
+
 .news-card .card-body {
-    padding: 20px;
+    padding: 22px;
 }
+
 .news-card .card-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #333;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #003366;
 }
+
 .news-card .card-text {
-    color: #666;
     font-size: 0.95rem;
+    color: #555;
     margin-top: 10px;
-    margin-bottom: 15px;
 }
+
 .news-card .btn-primary {
-    background-color: #007bff;
+    background-color: #0057B7;
     border: none;
-    font-weight: 600;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 8px;
 }
+
 .news-card .btn-primary:hover {
-    background-color: #0069d9;
+    background-color: #003F87;
 }
 
 /* ===== Map Section ===== */
 .map-section {
-    background: #f9fafb;
+    background: #F4F7FB;
     padding: 80px 0;
 }
+
 .map-section h2 {
     text-align: center;
-    font-weight: 700;
+    font-weight: 800;
     margin-bottom: 40px;
-    color: #333;
+    color: #003366;
+    letter-spacing: 1px;
 }
+
 .map-box {
-    border-radius: 12px;
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.12);
+    border: 2px solid #e6e6e6;
 }
+
 .locate-btn {
     display: inline-block;
-    margin-top: 20px;
-    padding: 12px 35px;
-    background-color: #28a745;
+    margin-top: 25px;
+    padding: 12px 40px;
+    background-color: #28A745;
     color: white;
-    font-weight: 600;
-    border-radius: 50px;
+    font-weight: 700;
+    border-radius: 40px;
     text-decoration: none;
-    transition: background-color 0.3s;
+    letter-spacing: 0.5px;
+    transition: 0.3s ease;
 }
+
 .locate-btn:hover {
-    background-color: #218838;
+    background-color: #1E7E34;
 }
 </style>
 

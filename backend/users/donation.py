@@ -11,7 +11,7 @@ from web3 import Web3
 user_donation_bp = Blueprint('user_donation', __name__)
 
 #START
-SEPOLIA_RPC_URL = os.getenv('SEPOLIA_RPC_URL')
+BLOCKCHAIN_RPC_URL = os.getenv('BLOCKCHAIN_RPC_URL')
 CONTRACT_ADDRESS = os.getenv('DONATION_CONTRACT_ADDRESS')
 CONTRACT_ABI = [
 	{
@@ -88,7 +88,8 @@ CONTRACT_ABI = [
 	}
 ]
 
-web3 = Web3(Web3.HTTPProvider(SEPOLIA_RPC_URL))
+web3 = Web3(Web3.HTTPProvider(BLOCKCHAIN_RPC_URL))
+print(web3.is_connected())
 contract = web3.eth.contract(address=Web3.to_checksum_address(CONTRACT_ADDRESS), abi=CONTRACT_ABI)
 BLOCKCHAIN_PRIVATE_KEY = os.getenv('BLOCKCHAIN_PRIVATE_KEY')
 
@@ -101,10 +102,11 @@ def write_donation_to_blockchain(txid, record_hash):
         'from': account.address,
         'nonce': nonce,
         'gas': 200000,
-        'gasPrice': web3.to_wei('10', 'gwei')
+        'gasPrice': web3.to_wei('30', 'gwei')
     })
     signed_txn = web3.eth.account.sign_transaction(txn, private_key=BLOCKCHAIN_PRIVATE_KEY)
     tx_hash = web3.eth.send_raw_transaction(signed_txn.raw_transaction)
+    print("Blockchain TX Hash:", tx_hash)
     return web3.to_hex(tx_hash)
 # END
 
@@ -119,13 +121,13 @@ def create_donation():
     birthday = data.get('birthday', None)
     amount = data['amount']
     donor_id = data.get('donor_id')
-
+    
     invoice_payload = {
         "external_id": f"donation_{datetime.datetime.now().timestamp()}",
         "payer_email": email,
         "description": f"Donation from {full_name}",
         "amount": float(amount),
-        "success_redirect_url": "https://localhost/help_pinoy/frontend/users/thank_you.php",
+        "success_redirect_url": "https://helppinoy.org/help_pinoy/frontend/users/thank_you.php",
     }
 
     XENDIT_APIKEY = os.getenv('XENDIT_APIKEY')
@@ -173,6 +175,7 @@ def create_donation():
 @user_donation_bp.route('/xendit_webhook', methods=['POST'])
 def xendit_webhook():
     data = request.json
+    print("Webhook received:", data)
 
     xendit_payment_id = data.get('id')
     payment_status = data.get('status')

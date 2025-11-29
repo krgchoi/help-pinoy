@@ -56,5 +56,11 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 mail = Mail(app)
 
+
+@app.route("/api/test")
+def api_test():
+    return {"status": "success", "message": "Flask backend is working!"}
+
+
 if __name__ == '__main__':
     app.run(debug=True)

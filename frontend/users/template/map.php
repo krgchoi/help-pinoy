@@ -62,12 +62,21 @@
   .list-group-item.center-list-item br {
     line-height: 1.5;
   }
+
+  /* Ensure the map element has an explicit min-height so Leaflet can render */
+  #map {
+    height: 100%;
+    min-height: 500px;
+    width: 100%;
+    border-radius: 0 20px 20px 0;
+  }
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  // Wrap logic into an init function and run it immediately if DOM already loaded
+  function initLeafletMap() {
     const config = window.mapConfig || {};
-    const centers = config.centers || [];
+    const rawCenters = config.centers || [];
     const enableSearch = config.enableSearch || false;
     const enableSort = config.enableSort || false;
     const showUserLocation = config.showUserLocation || false;
@@ -75,24 +84,32 @@
     const defaultLat = 12.8797,
       defaultLng = 121.7740,
       defaultZoom = 6;
+
+    // Create map
     let map = L.map('map').setView([defaultLat, defaultLng], defaultZoom);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
+
+    // Safely parse coordinates and filter invalid centers
+    const centers = rawCenters
+      .map(c => ({
+        ...c,
+        latitude: c.latitude !== null && c.latitude !== undefined ? parseFloat(c.latitude) : null,
+        longitude: c.longitude !== null && c.longitude !== undefined ? parseFloat(c.longitude) : null
+      }))
+      .filter(c => Number.isFinite(c.latitude) && Number.isFinite(c.longitude));
 
     let markers = centers.map(center => {
       const marker = L.marker([center.latitude, center.longitude]).addTo(map);
-      marker.bindPopup(`<strong>${center.name}</strong><br>${center.address}`);
-      return {
-        marker,
-        center
-      };
+      marker.bindPopup(`<strong>${center.name}</strong><br>${center.address || ''}`);
+      return { marker, center };
     });
 
-    
     function getDistanceKm(lat1, lng1, lat2, lng2) {
-      const R = 6371; 
+      const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLng = (lng2 - lng1) * Math.PI / 180;
       const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -116,7 +133,7 @@
           <strong>${center.name}</strong>
           ${distanceStr}
           <br>
-          ${center.address}<br>
+          ${center.address || ''}<br>
           ${center.contact_number ? `<strong>Contact:</strong> ${center.contact_number}<br>` : ''}
           ${center.email ? `<strong>Email:</strong> ${center.email}<br>` : ''}
           ${center.operating_hours ? `<strong>Operating Hours:</strong> ${center.operating_hours}<br>` : ''}
@@ -127,10 +144,8 @@
       html += '</ul>';
       listContainer.innerHTML = html;
 
-
       document.querySelectorAll('.center-list-item').forEach((item, idx) => {
         item.addEventListener('click', function() {
-   
           const markerObj = markers.find(m => m.center.name === sortedCenters[idx].name && m.center.address === sortedCenters[idx].address);
           if (markerObj) {
             map.setView([markerObj.center.latitude, markerObj.center.longitude], 16);
@@ -157,22 +172,18 @@
         userMarker.bindPopup('<strong>Your Location</strong>').openPopup();
 
         if (enableSort) {
-
           markers.sort((a, b) => {
             const distA = getDistanceKm(userLat, userLng, a.center.latitude, a.center.longitude);
             const distB = getDistanceKm(userLat, userLng, b.center.latitude, b.center.longitude);
             return distA - distB;
           });
-
           updateCenterList(markers.map(m => m.center), userLat, userLng);
         }
         map.setView([userLat, userLng], 13);
       }, function() {
-
         if (enableSort) updateCenterList(markers.map(m => m.center));
       });
     } else if (enableSort) {
-
       updateCenterList(markers.map(m => m.center));
     }
 
@@ -182,13 +193,10 @@
       if (searchInput) {
         searchInput.addEventListener('input', function(event) {
           const filter = searchInput.value.toLowerCase();
-          let filtered = markers.filter(({
-              center
-            }) =>
+          let filtered = markers.filter(({ center }) =>
             center.name.toLowerCase().includes(filter) ||
-            center.address.toLowerCase().includes(filter)
+            (center.address || '').toLowerCase().includes(filter)
           );
-          // If user location is available, show distance
           if (window.lastUserLat !== undefined && window.lastUserLng !== undefined) {
             updateCenterList(filtered.map(m => m.center), window.lastUserLat, window.lastUserLng);
           } else {
@@ -199,11 +207,8 @@
           if (event.key === 'Enter') {
             const filter = searchInput.value.toLowerCase();
             let found = false;
-            markers.forEach(({
-              marker,
-              center
-            }) => {
-              const matches = center.name.toLowerCase().includes(filter) || center.address.toLowerCase().includes(filter);
+            markers.forEach(({ marker, center }) => {
+              const matches = center.name.toLowerCase().includes(filter) || (center.address || '').toLowerCase().includes(filter);
               if (matches && !found) {
                 map.setView([center.latitude, center.longitude], 15);
                 marker.openPopup();
@@ -218,248 +223,16 @@
       }
     }
 
-    // Store user location globally for search filtering
-    if (showUserLocation && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(position) {
-        window.lastUserLat = position.coords.latitude;
-        window.lastUserLng = position.coords.longitude;
-      });
-    }
-  });
+    // Make sure Leaflet recalculates size after render/layout
+    setTimeout(() => {
+      try { map.invalidateSize(); } catch (e) { /* ignore */ }
+    }, 200);
+  }
+
+  // Attach or run immediately depending on document ready state
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLeafletMap);
+  } else {
+    initLeafletMap();
+  }
 </script>
-<!-- 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvcedPhvwwm6uGtRCdZB2e316IQh8omPc"></script>
-<style>
-  #centerList,
-  #centerList * {
-    font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
-  }
-
-  #centerList h4 {
-    font-size: 1.15rem;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: #1976d2;
-  }
-
-  .list-group-item.center-list-item {
-    padding: 16px 18px 12px 18px;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    border: 1px solid #e3e6f0;
-    background: #f9fbfd;
-    transition: background 0.2s, box-shadow 0.2s;
-    font-size: 1rem;
-  }
-
-  .list-group-item.center-list-item:hover {
-    background: #e3f0fc;
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.07);
-    cursor: pointer;
-  }
-
-  .center-list-item strong {
-    font-size: 1.08em;
-    font-weight: 600;
-    color: #222;
-  }
-
-  .center-distance-badge {
-    display: inline-block;
-    margin: 0 0 2px 8px;
-    padding: 1px 8px;
-    background: #1976d2;
-    color: #fff;
-    border-radius: 10px;
-    font-size: 10px;
-    font-weight: 500;
-    vertical-align: middle;
-    letter-spacing: 0.5px;
-  }
-
-  .list-group-item.center-list-item a {
-    color: #1976d2;
-    text-decoration: underline;
-    font-weight: 500;
-  }
-
-  .list-group-item.center-list-item a:hover {
-    color: #0d47a1;
-    text-decoration: underline;
-  }
-
-  .list-group-item.center-list-item br {
-    line-height: 1.5;
-  }
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const config = window.mapConfig || {};
-  const centers = config.centers || [];
-  const enableSearch = config.enableSearch || false;
-  const enableSort = config.enableSort || false;
-  const showUserLocation = config.showUserLocation || false;
-
-  const defaultLat = 12.8797,
-        defaultLng = 121.7740,
-        defaultZoom = 6;
-
-  // Initialize Google Map
-  let map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: defaultLat, lng: defaultLng },
-    zoom: defaultZoom
-  });
-
-  // Create markers
-  let markers = centers.map(center => {
-    const marker = new google.maps.Marker({
-      position: { lat: center.latitude, lng: center.longitude },
-      map: map,
-      title: center.name
-    });
-
-    const infoWindow = new google.maps.InfoWindow({
-      content: `<strong>${center.name}</strong><br>${center.address}`
-    });
-
-    marker.addListener("click", () => {
-      infoWindow.open(map, marker);
-    });
-
-    return { marker, center, infoWindow };
-  });
-
-  // Haversine formula for distance
-  function getDistanceKm(lat1, lng1, lat2, lng2) {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLng = (lng2 - lng1) * Math.PI / 180;
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLng / 2) * Math.sin(dLng / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  }
-
-  // Update center list UI
-  function updateCenterList(sortedCenters, userLat = null, userLng = null) {
-    const listContainer = document.getElementById('centerList');
-    if (!listContainer) return;
-
-    let html = '<h4>All Centers</h4><ul class="list-group">';
-    sortedCenters.forEach((center, idx) => {
-      let distanceStr = '';
-      if (userLat !== null && userLng !== null) {
-        const dist = getDistanceKm(userLat, userLng, center.latitude, center.longitude);
-        distanceStr = `<div class="center-distance-badge">${dist.toFixed(2)} km</div>`;
-      }
-      html += `<li class="list-group-item center-list-item" data-marker-idx="${idx}" style="cursor:pointer;">
-        <strong>${center.name}</strong>
-        ${distanceStr}
-        <br>
-        ${center.address}<br>
-        ${center.contact_number ? `<strong>Contact:</strong> ${center.contact_number}<br>` : ''}
-        ${center.email ? `<strong>Email:</strong> ${center.email}<br>` : ''}
-        ${center.operating_hours ? `<strong>Operating Hours:</strong> ${center.operating_hours}<br>` : ''}
-        ${center.type ? `<strong>Type:</strong> ${center.type}<br>` : ''}
-        ${center.website_url ? `<strong>Website:</strong> <a href="${center.website_url}" target="_blank">Visit</a><br>` : ''}
-      </li>`;
-    });
-    html += '</ul>';
-    listContainer.innerHTML = html;
-
-    // List click focuses on marker
-    document.querySelectorAll('.center-list-item').forEach((item, idx) => {
-      item.addEventListener('click', function() {
-        const markerObj = markers.find(m => 
-          m.center.name === sortedCenters[idx].name && 
-          m.center.address === sortedCenters[idx].address
-        );
-        if (markerObj) {
-          map.setCenter({ lat: markerObj.center.latitude, lng: markerObj.center.longitude });
-          map.setZoom(16);
-          markerObj.infoWindow.open(map, markerObj.marker);
-        }
-      });
-    });
-  }
-
-  // Show user location
-  if (showUserLocation && navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      const userLat = position.coords.latitude;
-      const userLng = position.coords.longitude;
-
-      const userMarker = new google.maps.Marker({
-        position: { lat: userLat, lng: userLng },
-        map: map,
-        icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-        title: "Your Location"
-      });
-
-      const infoWindow = new google.maps.InfoWindow({
-        content: "<strong>Your Location</strong>"
-      });
-      infoWindow.open(map, userMarker);
-
-      if (enableSort) {
-        markers.sort((a, b) => {
-          const distA = getDistanceKm(userLat, userLng, a.center.latitude, a.center.longitude);
-          const distB = getDistanceKm(userLat, userLng, b.center.latitude, b.center.longitude);
-          return distA - distB;
-        });
-        updateCenterList(markers.map(m => m.center), userLat, userLng);
-      }
-
-      map.setCenter({ lat: userLat, lng: userLng });
-      map.setZoom(13);
-      window.lastUserLat = userLat;
-      window.lastUserLng = userLng;
-    }, function() {
-      if (enableSort) updateCenterList(markers.map(m => m.center));
-    });
-  } else if (enableSort) {
-    updateCenterList(markers.map(m => m.center));
-  }
-
-  // Search
-  if (enableSearch) {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-      searchInput.addEventListener('input', function() {
-        const filter = searchInput.value.toLowerCase();
-        let filtered = markers.filter(({ center }) =>
-          center.name.toLowerCase().includes(filter) ||
-          center.address.toLowerCase().includes(filter)
-        );
-        if (window.lastUserLat !== undefined && window.lastUserLng !== undefined) {
-          updateCenterList(filtered.map(m => m.center), window.lastUserLat, window.lastUserLng);
-        } else {
-          updateCenterList(filtered.map(m => m.center));
-        }
-      });
-
-      searchInput.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-          const filter = searchInput.value.toLowerCase();
-          let found = false;
-          markers.forEach(({ marker, center, infoWindow }) => {
-            const matches = center.name.toLowerCase().includes(filter) || center.address.toLowerCase().includes(filter);
-            if (matches && !found) {
-              map.setCenter({ lat: center.latitude, lng: center.longitude });
-              map.setZoom(15);
-              infoWindow.open(map, marker);
-              found = true;
-            }
-          });
-          if (!filter) {
-            map.setCenter({ lat: defaultLat, lng: defaultLng });
-            map.setZoom(defaultZoom);
-          }
-        }
-      });
-    }
-  }
-});
-</script> -->
