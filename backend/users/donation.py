@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import datetime
 import requests
 from backend.utils import db_conn, cipher_suite
@@ -7,112 +7,19 @@ import hashlib
 import json
 from decimal import Decimal
 from web3 import Web3
-
+import uuid
+print("DONATION FORM HIT2")
 user_donation_bp = Blueprint('user_donation', __name__)
 
-#START
-BLOCKCHAIN_RPC_URL = os.getenv('BLOCKCHAIN_RPC_URL')
-CONTRACT_ADDRESS = os.getenv('DONATION_CONTRACT_ADDRESS')
-CONTRACT_ABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "hash",
-				"type": "string"
-			}
-		],
-		"name": "addDonation",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": False,
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			},
-			{
-				"indexed": False,
-				"internalType": "string",
-				"name": "hash",
-				"type": "string"
-			},
-			{
-				"indexed": False,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "DonationAdded",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "donations",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "hash",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-]
+ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'jfif', 'gif'}
 
-web3 = Web3(Web3.HTTPProvider(BLOCKCHAIN_RPC_URL))
-print(web3.is_connected())
-contract = web3.eth.contract(address=Web3.to_checksum_address(CONTRACT_ADDRESS), abi=CONTRACT_ABI)
-BLOCKCHAIN_PRIVATE_KEY = os.getenv('BLOCKCHAIN_PRIVATE_KEY')
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def write_donation_to_blockchain(txid, record_hash):
-    account = web3.eth.account.from_key(BLOCKCHAIN_PRIVATE_KEY)
-    nonce = web3.eth.get_transaction_count(account.address)
-    txn = contract.functions.addDonation(
-        txid, record_hash
-    ).build_transaction({
-        'from': account.address,
-        'nonce': nonce,
-        'gas': 200000,
-        'gasPrice': web3.to_wei('30', 'gwei')
-    })
-    signed_txn = web3.eth.account.sign_transaction(txn, private_key=BLOCKCHAIN_PRIVATE_KEY)
-    tx_hash = web3.eth.send_raw_transaction(signed_txn.raw_transaction)
-    print("Blockchain TX Hash:", tx_hash)
-    return web3.to_hex(tx_hash)
-# END
-
-
-@user_donation_bp.route('/donation_form', methods=['POST'])
+#Temporary Gcash Donation Flow for testing without Xendit integration
+@user_donation_bp.route('/donate', methods=['POST'])
 def create_donation():
+    print("DONATION FORM HIT")
     data = request.json
 
     full_name = data['full_name']
@@ -121,157 +28,89 @@ def create_donation():
     birthday = data.get('birthday', None)
     amount = data['amount']
     donor_id = data.get('donor_id')
-    
-    invoice_payload = {
-        "external_id": f"donation_{datetime.datetime.now().timestamp()}",
-        "payer_email": email,
-        "description": f"Donation from {full_name}",
-        "amount": float(amount),
-        "success_redirect_url": "https://helppinoy.org/help_pinoy/frontend/users/thank_you.php",
-    }
 
-    XENDIT_APIKEY = os.getenv('XENDIT_APIKEY')
-    xendit_response = requests.post(
-        "https://api.xendit.co/v2/invoices",
-        auth=(XENDIT_APIKEY, ''),
-        json=invoice_payload
-    )
-
-    if xendit_response.status_code != 200:
-        print("Xendit error:", xendit_response.text)
-        return jsonify({"error": "Xendit invoice failed"}), 400
-
-    invoice = xendit_response.json()
-    invouice_url = invoice.get('invoice_url')
-    payment_status = invoice.get('status')
-    payment_method = invoice.get('payment_channel', 'Xendit')
-    xendit_payment_id = invoice['id']
-    donation_date = datetime.datetime.now()
-
+    # Encrypt sensitive data
     encrypted_full_name = cipher_suite.encrypt(full_name.encode()).decode()
     encrypted_email = cipher_suite.encrypt(email.encode()).decode()
-    encrypted_contact_number = cipher_suite.encrypt(contact_number.encode()).decode()
+    encrypted_contact = cipher_suite.encrypt(contact_number.encode()).decode()
+
+    # Generate public ID
+    public_id = "DON-" + uuid.uuid4().hex[:10].upper()
 
     conn = db_conn()
     cursor = conn.cursor()
-    if donor_id:
-        cursor.execute(
-            "INSERT INTO donations (donor_id, full_name, email, contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date, invoice_url) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (donor_id, encrypted_full_name, encrypted_email, encrypted_contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date, invouice_url)
-        )
-    else:
-        cursor.execute(
-            "INSERT INTO donations (full_name, email, contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date, invoice_url) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (encrypted_full_name, encrypted_email, encrypted_contact_number, birthday, amount, payment_status, payment_method, xendit_payment_id, donation_date, invouice_url)
-        )
+
+    cursor.execute("""
+        INSERT INTO temp_donations 
+        (public_id, donor_id, full_name, email, contact_number, birthday, amount, donation_status, donation_date)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, 'PENDING', NOW())
+    """, (
+        public_id,
+        donor_id,
+        encrypted_full_name,
+        encrypted_email,
+        encrypted_contact,
+        birthday,
+        amount
+    ))
+
     conn.commit()
     cursor.close()
     conn.close()
 
     return jsonify({
-        "invoice_url": invoice['invoice_url']
+        "message": "Donation submitted successfully",
+        "public_id": public_id
     })
 
-@user_donation_bp.route('/xendit_webhook', methods=['POST'])
-def xendit_webhook():
-    data = request.json
-    print("Webhook received:", data)
+@user_donation_bp.route('/upload_receipt', methods=['POST'])
+def upload_receipt():
+    public_id = request.form.get('public_id')
 
-    xendit_payment_id = data.get('id')
-    payment_status = data.get('status')
-    payment_channel = data.get('payment_channel')
-    paid_at = data.get('paid_at')
-    receipt_url = data.get('receipt_url')
+    if 'receipt' not in request.files or not public_id:
+        return jsonify({'success': False, 'message': 'Missing receipt or public_id'}), 400
 
-    if not xendit_payment_id:
-        return jsonify({'status': 'error', 'message': 'Missing payment ID'}), 400
+    file = request.files['receipt']
 
-    conn = db_conn()
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE donations SET payment_status = %s, payment_method = %s, paid_at = %s, receipt_url = %s WHERE xendit_payment_id = %s",
-        (payment_status, payment_channel, paid_at, receipt_url, xendit_payment_id)
-    )
-    conn.commit()
+    if file.filename == '':
+        return jsonify({'success': False, 'message': 'No selected file'}), 400
 
-    # START
-    if payment_status == "PAID":
-        cursor.execute(
-            "SELECT full_name, email, contact_number, birthday, amount, payment_status, payment_method, donation_date, blockchain_tx FROM donations WHERE xendit_payment_id = %s",
-            (xendit_payment_id,)
-        )
-        row = cursor.fetchone()
-        if row and (not row[-1]):
-            try:
-                
-                full_name = row[0]
-                email = row[1]
-                contact_number = row[2]
-                birthday = row[3]
-                amount = row[4]
-                payment_status_db = row[5]
-                payment_method = row[6]
-                donation_date = row[7]
-                try:
-                    if isinstance(amount, Decimal):
-                        amount = float(amount)
-                except Exception:
-                    pass
-                try:
-                    if hasattr(donation_date, 'isoformat'):
-                        donation_date = donation_date.isoformat()
-                except Exception:
-                    donation_date = str(donation_date)
-                try:
-                    if hasattr(birthday, 'isoformat'):
-                        birthday = birthday.isoformat()
-                except Exception:
-                    birthday = str(birthday)
-                try:
-                    full_name = cipher_suite.decrypt(full_name.encode()).decode()
-                except Exception: pass
-                try:
-                    email = cipher_suite.decrypt(email.encode()).decode()
-                except Exception: pass
-                try:
-                    contact_number = cipher_suite.decrypt(contact_number.encode()).decode()
-                except Exception: pass
+    if file and allowed_file(file.filename):
+        from werkzeug.utils import secure_filename
+        import os
+        import uuid
 
-                data_string = json.dumps({
-                    "full_name": full_name,
-                    "email": email,
-                    "contact_number": contact_number,
-                    "birthday": birthday,
-                    "amount": amount,
-                    "xendit_payment_id": xendit_payment_id,
-                    "payment_status": payment_status_db,
-                    "payment_method": payment_method,
-                    "donation_date": donation_date
-                }, sort_keys=True)
-                record_hash = hashlib.sha256(data_string.encode()).hexdigest()
-                tx_hash = write_donation_to_blockchain(xendit_payment_id, record_hash)
-                print("Blockchain TX Hash:", tx_hash) 
-                receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
-                print("Blockchain TX Receipt:", receipt)  
-                if receipt.status == 1:
-                    cursor.execute(
-                        "UPDATE donations SET blockchain_tx = %s WHERE xendit_payment_id = %s",
-                        (tx_hash, xendit_payment_id)
-                    )
-                    conn.commit()
-                    print("blockchain_tx updated in DB")  
-                else:
-                    print("Blockchain transaction failed: Receipt status 0")
-            except Exception as e:
-                print("Blockchain write failed:", str(e))
-        else:
-            print("blockchain_tx already set or donation not found") 
-    # END
+        ext = os.path.splitext(file.filename)[1].lower()
+        filename = f"receipt_{public_id}_{uuid.uuid4().hex[:6]}{ext}"
 
-    cursor.close()
-    conn.close()
+        save_dir = os.path.abspath(os.path.join(current_app.root_path, 'frontend', 'admin', 'assets'))
+        os.makedirs(save_dir, exist_ok=True)
 
-    return jsonify({'status': 'success', 'message': 'Donation updated successfully'})
+        save_path = os.path.join(save_dir, filename)
+        file.save(save_path)
+
+        # Save filename in DB
+        conn = db_conn()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE temp_donations
+            SET proof_image = %s,
+                donation_status = 'UNDER_REVIEW'
+            WHERE public_id = %s
+        """, (filename, public_id))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'message': 'Receipt uploaded successfully',
+            'filename': filename
+        })
+
+    return jsonify({'success': False, 'message': 'Invalid file type'}), 400
 
 @user_donation_bp.route('/user_data', methods=['GET'])
 def user_data():
@@ -282,3 +121,8 @@ def user_data():
     cursor.close()
     conn.close()
     return jsonify(user_data)
+
+
+@user_donation_bp.route('/test', methods=['POST'])
+def test():
+    return jsonify({"status": "working"})

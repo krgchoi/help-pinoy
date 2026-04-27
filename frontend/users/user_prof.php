@@ -66,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $update_message = '<div class="alert alert-danger">Failed to update profile.</div>';
     }
 }
+
 ?>
 <style>
     :root {
@@ -344,10 +345,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         transition: all 0.3s ease;
     }
 
-    .strength-weak { background: var(--danger-red); width: 25%; }
-    .strength-fair { background: var(--warning-orange); width: 50%; }
-    .strength-good { background: #ffc107; width: 75%; }
-    .strength-strong { background: var(--success-green); width: 100%; }
+    .strength-weak {
+        background: var(--danger-red);
+        width: 25%;
+    }
+
+    .strength-fair {
+        background: var(--warning-orange);
+        width: 50%;
+    }
+
+    .strength-good {
+        background: #ffc107;
+        width: 75%;
+    }
+
+    .strength-strong {
+        background: var(--success-green);
+        width: 100%;
+    }
 
     .password-requirements {
         font-size: 0.875rem;
@@ -400,20 +416,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         .profile-info {
             padding: 20px;
         }
-        
+
         .donations-section {
             padding: 20px;
         }
-        
+
         .donation-table {
             display: block;
             overflow-x: auto;
         }
-        
+
         .profile-header {
             padding: 30px 0;
         }
-        
+
         .profile-avatar {
             width: 120px;
             height: 120px;
@@ -442,7 +458,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     }
 
     @keyframes spin {
-        to { transform: rotate(360deg); }
+        to {
+            transform: rotate(360deg);
+        }
     }
 </style>
 
@@ -453,9 +471,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
             <div class="profile-header">
                 <div class="container">
                     <div class="profile-avatar">
-                        <img id="profileImgPreview" src="../../static/profile_img/<?php echo htmlspecialchars($profile_img, ENT_QUOTES, 'UTF-8'); ?>?t=<?php echo time(); ?>" 
-                             alt="<?php echo htmlspecialchars($user['name'] ?? 'User Profile Image', ENT_QUOTES, 'UTF-8'); ?>"
-                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNzUiIGN5PSI3NSIgcj0iNzUiIGZpbGw9IiNlNmYyZmYiLz48cGF0aCBkPSJNNzUgODVBNzUgNzUgMCAwIDEgNzUgMTVWNzVINzVINzVaIiBmaWxsPSIjMDA1N2I3Ii8+PHBhdGggZD0iTTc1IDE1QTc1IDc1IDAgMCAwIDc1IDg1VjE1SDc1SDc1WiIgZmlsbD0iIzAwMzM2NiIvPjxjaXJjbGUgY3g9Ijc1IiBjeT0iNjAiIHI9IjI1IiBmaWxsPSIjZmZjYzAwIi8+PC9zdmc+'">
+                        <img id="profileImgPreview" src="../../static/profile_img/<?php echo htmlspecialchars($profile_img, ENT_QUOTES, 'UTF-8'); ?>?t=<?php echo time(); ?>"
+                            alt="<?php echo htmlspecialchars($user['name'] ?? 'User Profile Image', ENT_QUOTES, 'UTF-8'); ?>"
+                            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNzUiIGN5PSI3NSIgcj0iNzUiIGZpbGw9IiNlNmYyZmYiLz48cGF0aCBkPSJNNzUgODVBNzUgNzUgMCAwIDEgNzUgMTVWNzVINzVINzVaIiBmaWxsPSIjMDA1N2I3Ii8+PHBhdGggZD0iTTc1IDE1QTc1IDc1IDAgMCAwIDc1IDg1VjE1SDc1SDc1WiIgZmlsbD0iIzAwMzM2NiIvPjxjaXJjbGUgY3g9Ijc1IiBjeT0iNjAiIHI9IjI1IiBmaWxsPSIjZmZjYzAwIi8+PC9zdmc+'">
                         <form id="profileImgForm" enctype="multipart/form-data" method="post">
                             <input type="file" name="profile_img" id="profile_img" accept="image/*" style="display:none;">
                             <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
@@ -472,9 +490,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
             <!-- Profile Form -->
             <div class="profile-info">
                 <h3 class="section-title">Profile Information</h3>
-                
+
                 <?php echo $update_message; ?>
-                
+
                 <form method="post" action="" id="profileForm">
                     <div class="row">
                         <div class="col-md-12">
@@ -484,7 +502,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -499,7 +517,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -523,7 +541,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
@@ -536,7 +554,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="text-center mt-4">
                         <button class="btn btn-save" type="submit" name="update_profile" id="saveButton">
                             <span id="buttonText">Save Profile Changes</span>
@@ -549,7 +567,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         <!-- Donations Section -->
         <div class="donations-section">
             <h3 class="section-title">Your Donation History</h3>
-            
+
             <?php if (empty($donations)): ?>
                 <div class="text-center py-5">
                     <i class="fas fa-hand-holding-heart fa-3x text-muted mb-3"></i>
@@ -562,7 +580,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                     <table class="donation-table">
                         <thead>
                             <tr>
-                                <th>Receipt #</th>
+                                <th>DONATION #</th>
                                 <th>Amount</th>
                                 <th>Status</th>
                                 <th>Date</th>
@@ -573,32 +591,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                             <?php foreach ($donations as $donation): ?>
                                 <tr>
                                     <td>
-                                        <strong><?php echo htmlspecialchars($donation['receipt_no'] ?? '', ENT_QUOTES, 'UTF-8'); ?></strong>
+                                        <?php
+                                        $public_id = $donation['public_id'] ?? '';
+                                        echo htmlspecialchars(substr($public_id, 0, 8) . '...', ENT_QUOTES, 'UTF-8');
+                                        ?>
                                     </td>
+                                    <td>₱<?php echo number_format($donation['amount'] ?? 0, 2); ?></td>
                                     <td>
-                                        <strong class="text-primary">₱<?php echo htmlspecialchars($donation['amount'] ?? '', ENT_QUOTES, 'UTF-8'); ?></strong>
+                                        <?php
+                                        echo htmlspecialchars(ucfirst($donation['donation_status'] ?? 'Unknown'));
+                                        ?>
                                     </td>
+                                    <td><?php
+                                        echo date('M d, Y', strtotime($donation['donation_date'] ?? '')); ?></td>
                                     <td>
-                                        <span class="status-badge status-<?php echo strtolower($donation['status'] ?? ''); ?>">
-                                            <?php echo htmlspecialchars($donation['status'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo htmlspecialchars($donation['date'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
-                                    </td>
-                                    <td>
-                                        <?php if (strtolower($donation['status']) === 'paid' && !empty($donation['blockchain_tx'])): ?>
-                                            <a href="https://sepolia.etherscan.io/tx/<?php echo urlencode($donation['blockchain_tx']); ?>" 
-                                               target="_blank" class="btn-action btn-blockchain">
-                                                <i class="fas fa-link me-1"></i>View on Blockchain
+                                        <?php
+                                        $status = strtolower($donation['donation_status'] ?? '');
+                                        $receipt_uploaded = !empty($donation['receipt_image']);
+                                        $tx = $donation['blockchain_tx'] ?? '';
+                                        $donation_id = $donation['donation_id'] ?? '';
+                                        ?>
+                                        <?php if ($status === 'pending' && !$receipt_uploaded): ?>
+
+                                            <a href="upload_receipt.php?donation_id=<?php echo urlencode($donation_id); ?>"
+                                                class="btn-action btn-payment">
+                                                <i class="fas fa-upload me-1"></i>Upload Receipt
                                             </a>
-                                        <?php elseif (strtolower($donation['status']) === 'pending' && !empty($donation['invoice_url'])): ?>
-                                            <a href="<?php echo htmlspecialchars($donation['invoice_url'], ENT_QUOTES, 'UTF-8'); ?>" 
-                                               target="_blank" class="btn-action btn-payment">
-                                                <i class="fas fa-credit-card me-1"></i>Complete Payment
+
+                                        <?php elseif ($status === 'under_review' && $receipt_uploaded): ?>
+
+                                            <span class="text-warning fw-bold">
+                                                <i class="fas fa-clock me-1"></i>Verifying
+                                            </span>
+
+                                        <?php elseif (($status === 'approved' || $status === 'paid') && !empty($tx)): ?>
+                                            <a href="https://amoy.polygonscan.com/tx/<?php echo urlencode($tx); ?>"
+                                                target="_blank"
+                                                class="btn-action btn-blockchain">
+                                                <i class="fas fa-link me-1"></i>View Blockchain
                                             </a>
+
+                                        <?php elseif ($status === 'rejected'): ?>
+
+                                            <span class="text-danger fw-bold">
+                                                <i class="fas fa-times-circle me-1"></i>Rejected
+                                            </span>
+
                                         <?php else: ?>
-                                            <span class="text-muted">No action required</span>
+
+                                            <span class="text-muted">No action</span>
+
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -618,21 +660,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     document.getElementById('password').addEventListener('input', function() {
         const password = this.value;
         const strengthBar = document.getElementById('passwordStrength');
-        
+
         // Check requirements
         const hasLength = password.length >= 8;
         const hasUpper = /[A-Z]/.test(password);
         const hasLower = /[a-z]/.test(password);
         const hasNumber = /[0-9]/.test(password);
         const hasSpecial = /[\W_]/.test(password);
-        
+
         // Update requirement indicators
         document.getElementById('reqLength').className = hasLength ? 'requirement met' : 'requirement unmet';
         document.getElementById('reqUpper').className = hasUpper ? 'requirement met' : 'requirement unmet';
         document.getElementById('reqLower').className = hasLower ? 'requirement met' : 'requirement unmet';
         document.getElementById('reqNumber').className = hasNumber ? 'requirement met' : 'requirement unmet';
         document.getElementById('reqSpecial').className = hasSpecial ? 'requirement met' : 'requirement unmet';
-        
+
         // Calculate strength
         let strength = 0;
         if (hasLength) strength++;
@@ -640,7 +682,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         if (hasLower) strength++;
         if (hasNumber) strength++;
         if (hasSpecial) strength++;
-        
+
         // Update strength bar
         strengthBar.className = 'password-strength ';
         if (strength <= 1) strengthBar.classList.add('strength-weak');
@@ -654,7 +696,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         const password = document.getElementById('password').value;
         const confirmPassword = this.value;
         const help = document.getElementById('confirmPasswordHelp');
-        
+
         if (confirmPassword && password !== confirmPassword) {
             help.textContent = "Passwords do not match";
         } else {
@@ -667,19 +709,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm_password').value;
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-        
+
         if (password.length > 0 && !regex.test(password)) {
             e.preventDefault();
             alert('Please ensure your password meets all the requirements.');
             return;
         }
-        
+
         if (password !== confirmPassword) {
             e.preventDefault();
             alert('Passwords do not match.');
             return;
         }
-        
+
         // Show loading state
         const button = document.getElementById('saveButton');
         const buttonText = document.getElementById('buttonText');
@@ -693,11 +735,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         var formData = new FormData(document.getElementById('profileImgForm'));
         const button = document.querySelector('.change-photo-btn');
         const originalIcon = button.innerHTML;
-        
+
         // Show loading state
         button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         button.disabled = true;
-        
+
         fetch('http://localhost:5000/user/user_upload_profile_image', {
                 method: 'POST',
                 body: formData

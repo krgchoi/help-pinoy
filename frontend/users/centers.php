@@ -1,4 +1,4 @@
-<?php 
+<?php
 include "./template/header.php";
 
 $url = "http://localhost:5000/user/user_get_locations";
@@ -18,28 +18,32 @@ $centers = json_decode($response, true);
         transition: 0.2s;
         cursor: pointer;
     }
+
     .center-card:hover {
         background: #f8f9fa;
-        box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
+        box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
     }
+
     #centerList::-webkit-scrollbar {
         width: 6px;
     }
+
     #centerList::-webkit-scrollbar-thumb {
         background: #ccc;
         border-radius: 10px;
     }
+
     #map {
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0px 3px 12px rgba(0,0,0,0.2);
+        box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.2);
     }
 </style>
 
 <div class="container my-4 min-vh-100" style="padding-top: 120px;">
     <div class="text-center mb-4">
-        <h2 class="fw-bold">Donation Centers</h2>
-        <p class="text-muted">Find the nearest donation center in Guimbal.</p>
+        <h2 class="fw-bold">Drop-Off Locations</h2>
+        <p class="text-muted">Find the nearest Drop-off Locations in Guimbal.</p>
     </div>
 
     <div class="row g-4">
@@ -53,7 +57,7 @@ $centers = json_decode($response, true);
                 <input type="text" id="searchInput" class="form-control" placeholder="Search Nearby Centers...">
             </div>
 
-            <div id="centerList" class="flex-grow-1" 
+            <div id="centerList" class="flex-grow-1"
                 style="height: 460px; overflow-y: auto; padding-right: 6px;">
             </div>
         </div>

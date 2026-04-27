@@ -247,11 +247,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             .login-body {
                 padding: 20px;
             }
-            
+
             .login-header {
                 padding: 20px 15px;
             }
-            
+
             .login-header h2 {
                 font-size: 1.5rem;
             }
@@ -269,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <h2>Help Pinoy</h2>
                 <p>Admin Portal Access</p>
             </div>
-            
+
             <div class="login-body">
                 <?php if (isset($message)) : ?>
                     <div class="alert alert-danger" role="alert">
@@ -304,7 +304,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <i class="fas fa-sign-in-alt"></i> Login to Dashboard
                     </button>
                 </form>
-                
+
                 <div class="footer-text">
                     <p>Secure access to Help Pinoy administration panel</p>
                 </div>
@@ -318,7 +318,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         document.getElementById('passwordToggle').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const icon = this.querySelector('i');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 icon.classList.remove('fa-eye');
@@ -329,23 +329,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 icon.classList.add('fa-eye');
             }
         });
-        
+
         // Enable login button after reCAPTCHA verification
         function enableLoginBtn() {
             document.getElementById('loginBtn').disabled = false;
         }
-        
+
         // Form validation
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
+
             if (!email || !password) {
                 e.preventDefault();
                 alert('Please fill in all required fields.');
                 return false;
             }
-            
+
             // Show loading state
             const loginBtn = document.getElementById('loginBtn');
             loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';

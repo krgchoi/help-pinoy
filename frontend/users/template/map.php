@@ -105,7 +105,10 @@
     let markers = centers.map(center => {
       const marker = L.marker([center.latitude, center.longitude]).addTo(map);
       marker.bindPopup(`<strong>${center.name}</strong><br>${center.address || ''}`);
-      return { marker, center };
+      return {
+        marker,
+        center
+      };
     });
 
     function getDistanceKm(lat1, lng1, lat2, lng2) {
@@ -193,7 +196,9 @@
       if (searchInput) {
         searchInput.addEventListener('input', function(event) {
           const filter = searchInput.value.toLowerCase();
-          let filtered = markers.filter(({ center }) =>
+          let filtered = markers.filter(({
+              center
+            }) =>
             center.name.toLowerCase().includes(filter) ||
             (center.address || '').toLowerCase().includes(filter)
           );
@@ -207,7 +212,10 @@
           if (event.key === 'Enter') {
             const filter = searchInput.value.toLowerCase();
             let found = false;
-            markers.forEach(({ marker, center }) => {
+            markers.forEach(({
+              marker,
+              center
+            }) => {
               const matches = center.name.toLowerCase().includes(filter) || (center.address || '').toLowerCase().includes(filter);
               if (matches && !found) {
                 map.setView([center.latitude, center.longitude], 15);
@@ -225,7 +233,10 @@
 
     // Make sure Leaflet recalculates size after render/layout
     setTimeout(() => {
-      try { map.invalidateSize(); } catch (e) { /* ignore */ }
+      try {
+        map.invalidateSize();
+      } catch (e) {
+        /* ignore */ }
     }, 200);
   }
 

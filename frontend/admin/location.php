@@ -6,7 +6,7 @@ $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Content-Type: application/json',
-    "get-token: $jwt_token"
+    "Authorization: Bearer $jwt_token"
 ]);
 
 $response = curl_exec($ch);
@@ -146,6 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -334,14 +335,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border-radius: 8px;
             border: 2px solid #e9ecef;
             padding: 10px 15px;
             transition: var(--transition);
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
         }
@@ -390,7 +393,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
             font-weight: 500;
         }
 
-        .filter-btn:hover, .filter-btn.active {
+        .filter-btn:hover,
+        .filter-btn.active {
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
@@ -439,11 +443,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
             .stats-card .card-value {
                 font-size: 1.5rem;
             }
-            
+
             .table thead {
                 display: none;
             }
-            
+
             .table tbody tr {
                 display: block;
                 margin-bottom: 1rem;
@@ -451,25 +455,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                 border-radius: var(--border-radius);
                 padding: 1rem;
             }
-            
+
             .table tbody td {
                 display: block;
                 text-align: right;
                 padding: 0.5rem 0;
                 border: none;
             }
-            
+
             .table tbody td::before {
                 content: attr(data-label);
                 float: left;
                 font-weight: 600;
                 color: var(--dark-color);
             }
-            
+
             .location-info {
                 justify-content: space-between;
             }
-            
+
             .location-icon {
                 margin-right: 0;
                 margin-bottom: 8px;
@@ -477,6 +481,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
         }
     </style>
 </head>
+
 <body>
     <!-- Dashboard Header -->
     <div class="dashboard-header">
@@ -507,50 +512,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="card-value"><?php
-                        $typeCount = [];
-                        if (!empty($data)) {
-                            foreach ($data as $location) {
-                                $type = $location['type'] ?: 'General';
-                                if (!isset($typeCount[$type])) {
-                                    $typeCount[$type] = 0;
-                                }
-                                $typeCount[$type]++;
-                            }
-                        }
-                        echo count($typeCount);
-                    ?></div>
+                                            $typeCount = [];
+                                            if (!empty($data)) {
+                                                foreach ($data as $location) {
+                                                    $type = $location['type'] ?: 'General';
+                                                    if (!isset($typeCount[$type])) {
+                                                        $typeCount[$type] = 0;
+                                                    }
+                                                    $typeCount[$type]++;
+                                                }
+                                            }
+                                            echo count($typeCount);
+                                            ?></div>
                     <div class="card-label">Center Types</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="card-value"><?php
-                        $contactCount = 0;
-                        if (!empty($data)) {
-                            foreach ($data as $location) {
-                                if (!empty($location['contact_number'])) {
-                                    $contactCount++;
-                                }
-                            }
-                        }
-                        echo $contactCount;
-                    ?></div>
+                                            $contactCount = 0;
+                                            if (!empty($data)) {
+                                                foreach ($data as $location) {
+                                                    if (!empty($location['contact_number'])) {
+                                                        $contactCount++;
+                                                    }
+                                                }
+                                            }
+                                            echo $contactCount;
+                                            ?></div>
                     <div class="card-label">With Contact Info</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="card-value"><?php
-                        $websiteCount = 0;
-                        if (!empty($data)) {
-                            foreach ($data as $location) {
-                                if (!empty($location['website_url'])) {
-                                    $websiteCount++;
-                                }
-                            }
-                        }
-                        echo $websiteCount;
-                    ?></div>
+                                            $websiteCount = 0;
+                                            if (!empty($data)) {
+                                                foreach ($data as $location) {
+                                                    if (!empty($location['website_url'])) {
+                                                        $websiteCount++;
+                                                    }
+                                                }
+                                            }
+                                            echo $websiteCount;
+                                            ?></div>
                     <div class="card-label">With Websites</div>
                 </div>
             </div>
@@ -634,18 +639,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                                 </td>
                                 <td data-label="Actions">
                                     <button class="btn btn-action btn-view me-2" data-bs-toggle="modal"
-                                            data-bs-target="#locationModal<?php echo $location['id']; ?>" title="View Details">
+                                        data-bs-target="#locationModal<?php echo $location['id']; ?>" title="View Details">
                                         <i class="bi bi-eye me-1"></i> View
                                     </button>
                                     <button class="btn btn-action btn-edit me-2" data-bs-toggle="modal"
-                                            data-bs-target="#editLocation<?php echo $location['id']; ?>" title="Edit Location">
+                                        data-bs-target="#editLocation<?php echo $location['id']; ?>" title="Edit Location">
                                         <i class="bi bi-pencil me-1"></i> Edit
                                     </button>
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="location_id" value="<?php echo htmlspecialchars($location['id']); ?>">
-                                        <button type="submit" name="delete_center" class="btn btn-action btn-delete" 
-                                                onclick="return confirm('Are you sure you want to delete this donation center? This action cannot be undone.')" 
-                                                title="Delete Location">
+                                        <button type="submit" name="delete_center" class="btn btn-action btn-delete"
+                                            onclick="return confirm('Are you sure you want to delete this donation center? This action cannot be undone.')"
+                                            title="Delete Location">
                                             <i class="bi bi-trash me-1"></i> Delete
                                         </button>
                                     </form>
@@ -668,14 +673,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                     <?php endif; ?>
                 </tbody>
             </table>
-            
+
             <!-- Pagination -->
             <?php if (!empty($data)): ?>
-            <div class="p-3 border-top">
-                <nav>
-                    <ul class="pagination justify-content-center mb-0" id="locationTablePagination"></ul>
-                </nav>
-            </div>
+                <div class="p-3 border-top">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0" id="locationTablePagination"></ul>
+                    </nav>
+                </div>
             <?php endif; ?>
         </div>
     </div>
@@ -693,48 +698,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Location Name</label>
-                                <input type="text" class="form-control" name="name" required 
-                                       placeholder="Enter center name">
+                                <input type="text" class="form-control" name="name" required
+                                    placeholder="Enter center name">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Type</label>
-                                <input type="text" class="form-control" name="type" 
-                                       placeholder="e.g., Blood Bank, Food Bank">
+                                <input type="text" class="form-control" name="type"
+                                    placeholder="e.g., Blood Bank, Food Bank">
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-medium">Address</label>
-                                <input type="text" class="form-control" name="address" required 
-                                       placeholder="Enter full address">
+                                <input type="text" class="form-control" name="address" required
+                                    placeholder="Enter full address">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Latitude</label>
-                                <input type="text" class="form-control" name="latitude" required 
-                                       placeholder="e.g., 14.5995">
+                                <input type="text" class="form-control" name="latitude" required
+                                    placeholder="e.g., 14.5995">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Longitude</label>
-                                <input type="text" class="form-control" name="longitude" required 
-                                       placeholder="e.g., 120.9842">
+                                <input type="text" class="form-control" name="longitude" required
+                                    placeholder="e.g., 120.9842">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Contact Number</label>
-                                <input type="text" class="form-control" name="contact_number" 
-                                       placeholder="Enter phone number">
+                                <input type="text" class="form-control" name="contact_number"
+                                    placeholder="Enter phone number">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Email</label>
-                                <input type="email" class="form-control" name="email" 
-                                       placeholder="Enter email address">
+                                <input type="email" class="form-control" name="email"
+                                    placeholder="Enter email address">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Operating Hours</label>
-                                <input type="text" class="form-control" name="operating_hours" 
-                                       placeholder="e.g., Mon-Fri 9AM-5PM">
+                                <input type="text" class="form-control" name="operating_hours"
+                                    placeholder="e.g., Mon-Fri 9AM-5PM">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Website URL</label>
-                                <input type="url" class="form-control" name="website_url" 
-                                       placeholder="https://example.com">
+                                <input type="url" class="form-control" name="website_url"
+                                    placeholder="https://example.com">
                             </div>
                         </div>
                     </div>
@@ -769,8 +774,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                                     </div>
                                     <div class="col-md-6">
                                         <strong>Coordinates:</strong><br>
-                                        <a href="https://maps.google.com/?q=<?php echo htmlspecialchars($location['latitude']); ?>,<?php echo htmlspecialchars($location['longitude']); ?>" 
-                                           target="_blank" class="map-link">
+                                        <a href="https://maps.google.com/?q=<?php echo htmlspecialchars($location['latitude']); ?>,<?php echo htmlspecialchars($location['longitude']); ?>"
+                                            target="_blank" class="map-link">
                                             <i class="bi bi-geo-alt me-1"></i>
                                             <?php echo htmlspecialchars($location['latitude']); ?>, <?php echo htmlspecialchars($location['longitude']); ?>
                                         </a>
@@ -782,31 +787,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                                         </span>
                                     </div>
                                     <?php if (!empty($location['contact_number'])): ?>
-                                    <div class="col-md-6">
-                                        <strong>Contact:</strong><br>
-                                        <i class="bi bi-telephone me-1"></i><?php echo htmlspecialchars($location['contact_number']); ?>
-                                    </div>
+                                        <div class="col-md-6">
+                                            <strong>Contact:</strong><br>
+                                            <i class="bi bi-telephone me-1"></i><?php echo htmlspecialchars($location['contact_number']); ?>
+                                        </div>
                                     <?php endif; ?>
                                     <?php if (!empty($location['email'])): ?>
-                                    <div class="col-md-6">
-                                        <strong>Email:</strong><br>
-                                        <i class="bi bi-envelope me-1"></i><?php echo htmlspecialchars($location['email']); ?>
-                                    </div>
+                                        <div class="col-md-6">
+                                            <strong>Email:</strong><br>
+                                            <i class="bi bi-envelope me-1"></i><?php echo htmlspecialchars($location['email']); ?>
+                                        </div>
                                     <?php endif; ?>
                                     <?php if (!empty($location['operating_hours'])): ?>
-                                    <div class="col-12">
-                                        <strong>Operating Hours:</strong><br>
-                                        <i class="bi bi-clock me-1"></i><?php echo htmlspecialchars($location['operating_hours']); ?>
-                                    </div>
+                                        <div class="col-12">
+                                            <strong>Operating Hours:</strong><br>
+                                            <i class="bi bi-clock me-1"></i><?php echo htmlspecialchars($location['operating_hours']); ?>
+                                        </div>
                                     <?php endif; ?>
                                     <?php if (!empty($location['website_url'])): ?>
-                                    <div class="col-12">
-                                        <strong>Website:</strong><br>
-                                        <a href="<?php echo htmlspecialchars($location['website_url']); ?>" target="_blank" class="map-link">
-                                            <i class="bi bi-globe me-1"></i>
-                                            <?php echo htmlspecialchars($location['website_url']); ?>
-                                        </a>
-                                    </div>
+                                        <div class="col-12">
+                                            <strong>Website:</strong><br>
+                                            <a href="<?php echo htmlspecialchars($location['website_url']); ?>" target="_blank" class="map-link">
+                                                <i class="bi bi-globe me-1"></i>
+                                                <?php echo htmlspecialchars($location['website_url']); ?>
+                                            </a>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -835,48 +840,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label fw-medium">Location Name</label>
-                                        <input type="text" class="form-control" name="name" 
-                                               value="<?php echo htmlspecialchars($location['name'], ENT_QUOTES, 'UTF-8'); ?>" required>
+                                        <input type="text" class="form-control" name="name"
+                                            value="<?php echo htmlspecialchars($location['name'], ENT_QUOTES, 'UTF-8'); ?>" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-medium">Type</label>
-                                        <input type="text" class="form-control" name="type" 
-                                               value="<?php echo htmlspecialchars($location['type'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <input type="text" class="form-control" name="type"
+                                            value="<?php echo htmlspecialchars($location['type'], ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label fw-medium">Address</label>
-                                        <input type="text" class="form-control" name="address" 
-                                               value="<?php echo htmlspecialchars($location['address'], ENT_QUOTES, 'UTF-8'); ?>" required>
+                                        <input type="text" class="form-control" name="address"
+                                            value="<?php echo htmlspecialchars($location['address'], ENT_QUOTES, 'UTF-8'); ?>" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-medium">Latitude</label>
-                                        <input type="text" class="form-control" name="latitude" 
-                                               value="<?php echo htmlspecialchars($location['latitude'], ENT_QUOTES, 'UTF-8'); ?>" required>
+                                        <input type="text" class="form-control" name="latitude"
+                                            value="<?php echo htmlspecialchars($location['latitude'], ENT_QUOTES, 'UTF-8'); ?>" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-medium">Longitude</label>
-                                        <input type="text" class="form-control" name="longitude" 
-                                               value="<?php echo htmlspecialchars($location['longitude'], ENT_QUOTES, 'UTF-8'); ?>" required>
+                                        <input type="text" class="form-control" name="longitude"
+                                            value="<?php echo htmlspecialchars($location['longitude'], ENT_QUOTES, 'UTF-8'); ?>" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-medium">Contact Number</label>
-                                        <input type="text" class="form-control" name="contact_number" 
-                                               value="<?php echo htmlspecialchars($location['contact_number'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <input type="text" class="form-control" name="contact_number"
+                                            value="<?php echo htmlspecialchars($location['contact_number'], ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-medium">Email</label>
-                                        <input type="email" class="form-control" name="email" 
-                                               value="<?php echo htmlspecialchars($location['email'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <input type="email" class="form-control" name="email"
+                                            value="<?php echo htmlspecialchars($location['email'], ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-medium">Operating Hours</label>
-                                        <input type="text" class="form-control" name="operating_hours" 
-                                               value="<?php echo htmlspecialchars($location['operating_hours'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <input type="text" class="form-control" name="operating_hours"
+                                            value="<?php echo htmlspecialchars($location['operating_hours'], ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-medium">Website URL</label>
-                                        <input type="url" class="form-control" name="website_url" 
-                                               value="<?php echo htmlspecialchars($location['website_url'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <input type="url" class="form-control" name="website_url"
+                                            value="<?php echo htmlspecialchars($location['website_url'], ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
                                 </div>
                                 <input type="hidden" name="location_id" value="<?php echo htmlspecialchars($location['id'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -900,20 +905,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
         searchInput.addEventListener('keyup', function() {
             const filter = searchInput.value.toLowerCase();
             const rows = document.querySelectorAll('#locationTable tbody tr');
-            
+
             let visibleCount = 0;
-            
+
             rows.forEach(row => {
                 const name = row.children[0].textContent.toLowerCase();
                 const address = row.children[0].querySelector('.text-muted').textContent.toLowerCase();
                 const type = row.children[2].textContent.toLowerCase();
-                
+
                 const isVisible = name.includes(filter) || address.includes(filter) || type.includes(filter);
                 row.style.display = isVisible ? '' : 'none';
-                
+
                 if (isVisible) visibleCount++;
             });
-            
+
             // Update pagination after filtering
             if (visibleCount > 0) {
                 paginateTable('locationTable', 'locationTablePagination', 10);
@@ -926,10 +931,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                 // Update active state
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                
+
                 const filter = this.getAttribute('data-filter');
                 const rows = document.querySelectorAll('#locationTable tbody tr');
-                
+
                 rows.forEach(row => {
                     if (filter === 'all') {
                         row.style.display = '';
@@ -938,7 +943,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                         row.style.display = type === filter ? '' : 'none';
                     }
                 });
-                
+
                 // Update pagination after filtering
                 paginateTable('locationTable', 'locationTablePagination', 10);
             });
@@ -950,18 +955,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
             const tbody = table.querySelector('tbody');
             const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.style.display !== 'none');
             const pagination = document.getElementById(paginationId);
-            
+
             if (rows.length === 0) return;
 
             function showPage(page) {
                 const start = (page - 1) * rowsPerPage;
                 const end = start + rowsPerPage;
-                
+
                 // Hide all rows first
                 document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
                     row.style.display = 'none';
                 });
-                
+
                 // Show only rows for current page
                 rows.forEach((row, i) => {
                     if (i >= start && i < end) {
@@ -973,9 +978,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
             function renderPagination() {
                 pagination.innerHTML = '';
                 const pageCount = Math.ceil(rows.length / rowsPerPage);
-                
+
                 if (pageCount <= 1) return;
-                
+
                 // Previous button
                 const prevLi = document.createElement('li');
                 prevLi.className = 'page-item';
@@ -992,7 +997,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                 };
                 prevLi.appendChild(prevA);
                 pagination.appendChild(prevLi);
-                
+
                 // Page numbers
                 for (let i = 1; i <= pageCount; i++) {
                     const li = document.createElement('li');
@@ -1010,7 +1015,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                     li.appendChild(a);
                     pagination.appendChild(li);
                 }
-                
+
                 // Next button
                 const nextLi = document.createElement('li');
                 nextLi.className = 'page-item';
@@ -1027,7 +1032,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                 };
                 nextLi.appendChild(nextA);
                 pagination.appendChild(nextLi);
-                
+
                 if (pagination.children.length > 0) pagination.children[1].classList.add('active');
             }
 
@@ -1043,4 +1048,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
 
     <?php include('./template/foot.php'); ?>
 </body>
+
 </html>

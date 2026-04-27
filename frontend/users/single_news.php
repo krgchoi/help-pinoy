@@ -167,30 +167,30 @@ if (!$news_item) {
     }
 
     .back-to-news {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: white !important;
-    text-decoration: none;
-    font-weight: 600;
-    margin-bottom: 30px;
-    transition: all 0.3s ease;
-    padding: 12px 24px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    position: relative;
-    z-index: 100;
-}
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: white !important;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 30px;
+        transition: all 0.3s ease;
+        padding: 12px 24px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        position: relative;
+        z-index: 100;
+    }
 
-.back-to-news:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateX(-5px);
-    color: white !important;
-    text-decoration: none;
-}
+    .back-to-news:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateX(-5px);
+        color: white !important;
+        text-decoration: none;
+    }
 
     .social-share {
         display: flex;
@@ -214,9 +214,18 @@ if (!$news_item) {
         color: white;
     }
 
-    .share-btn.facebook { background: #3b5998; }
-    .share-btn.twitter { background: #1da1f2; }
-    .share-btn.linkedin { background: #0077b5; }
+    .share-btn.facebook {
+        background: #3b5998;
+    }
+
+    .share-btn.twitter {
+        background: #1da1f2;
+    }
+
+    .share-btn.linkedin {
+        background: #0077b5;
+    }
+
     .share-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -351,10 +360,10 @@ if (!$news_item) {
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto text-center">
-                <a href="<?php echo dirname($_SERVER['PHP_SELF']) . '/news.php'; ?>" class="back-to-news">
-    <i class="fas fa-arrow-left"></i>
-    Back to All Stories
-</a>
+                <a href="<?= BASE_URL ?>news.php" class="back-to-news">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to All Stories
+                </a>
                 <div class="article-category">
                     <?php echo htmlspecialchars($news_item['category']); ?>
                 </div>
@@ -383,30 +392,31 @@ if (!$news_item) {
     <div class="row">
         <div class="col-lg-8 mx-auto">
             <div class="news-article-container">
+
                 <!-- Article Image -->
                 <?php if (!empty($news_item['image_url'])): ?>
-                    <img src="http://localhost:5000/static/news_img/<?php echo htmlspecialchars($news_item['image_url']); ?>" 
-                         alt="<?php echo htmlspecialchars($news_item['title']); ?>" 
-                         class="article-image">
+                    <img
+                        src="<?= API_BASE ?>/static/news_img/<?= htmlspecialchars($news_item['image_url']); ?>"
+                        alt="<?= htmlspecialchars($news_item['title']); ?>"
+                        class="article-image"
+                        onerror="this.src='<?= BASE_URL ?>assets/img/default-news.jpg'">
                 <?php else: ?>
-                    <img src="../assets/img/default-news.jpg" 
-                         alt="Default News Image" 
-                         class="article-image">
+                    <img
+                        src="<?= BASE_URL ?>assets/img/default-news.jpg"
+                        alt="Default News Image"
+                        class="article-image">
                 <?php endif; ?>
 
                 <!-- Article Content -->
                 <div class="article-content">
-                    <?php echo formatNewsContent($news_item['content']); ?>
+                    <?= formatNewsContent($news_item['content']); ?>
                 </div>
 
                 <!-- Tags -->
                 <?php if (!empty($news_item['tags'])): ?>
                     <div class="article-tags">
-                        <?php 
-                        $tags = explode(',', $news_item['tags']);
-                        foreach ($tags as $tag): 
-                        ?>
-                            <span class="tag"><?php echo htmlspecialchars(trim($tag)); ?></span>
+                        <?php foreach (explode(',', $news_item['tags']) as $tag): ?>
+                            <span class="tag"><?= htmlspecialchars(trim($tag)); ?></span>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
@@ -414,40 +424,44 @@ if (!$news_item) {
                 <!-- Social Share -->
                 <div class="social-share">
                     <span class="me-3 fw-bold text-dark">Share this story:</span>
-                    <a href="#" class="share-btn facebook" onclick="shareOnFacebook()">
+                    <a href="#" class="share-btn facebook" onclick="shareOnFacebook(); return false;">
                         <i class="fab fa-facebook-f"></i> Facebook
                     </a>
-                    <a href="#" class="share-btn twitter" onclick="shareOnTwitter()">
+                    <a href="#" class="share-btn twitter" onclick="shareOnTwitter(); return false;">
                         <i class="fab fa-twitter"></i> Twitter
                     </a>
-                    <a href="#" class="share-btn linkedin" onclick="shareOnLinkedIn()">
+                    <a href="#" class="share-btn linkedin" onclick="shareOnLinkedIn(); return false;">
                         <i class="fab fa-linkedin-in"></i> LinkedIn
                     </a>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
-<?php 
+
+<?php
 // Helper functions
-function estimateReadingTime($content) {
+function estimateReadingTime($content)
+{
     $word_count = str_word_count(strip_tags($content));
     $reading_time = ceil($word_count / 200); // 200 words per minute
     return max(1, $reading_time); // Minimum 1 minute
 }
 
-function formatNewsContent($content) {
+function formatNewsContent($content)
+{
     // Convert line breaks to paragraphs
     $paragraphs = explode("\n", trim($content));
     $formatted = '';
-    
+
     foreach ($paragraphs as $paragraph) {
         if (trim($paragraph) !== '') {
             $formatted .= '<p>' . nl2br(htmlspecialchars($paragraph)) . '</p>';
         }
     }
-    
+
     return $formatted;
 }
 ?>
@@ -462,7 +476,7 @@ function formatNewsContent($content) {
         const scrollTop = window.pageYOffset;
         const trackLength = docHeight - winHeight;
         const progress = Math.floor((scrollTop / trackLength) * 100);
-        
+
         document.getElementById('readingProgress').style.width = progress + '%';
     });
 

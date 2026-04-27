@@ -40,7 +40,7 @@ app.register_blueprint(register_bp, url_prefix='/user')
 app.register_blueprint(user_donation_bp, url_prefix='/user')
 app.register_blueprint(profile_bp, url_prefix='/user') 
 app.register_blueprint(auth_bp, url_prefix='/user')  
-app.register_blueprint(news_users_bp, url_prefix='/user') 
+app.register_blueprint(news_users_bp, url_prefix='/user')
 app.register_blueprint(user_centers_bp, url_prefix='/user')
 
 

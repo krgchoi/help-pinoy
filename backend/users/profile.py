@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, send_from_directory, current_app
 from backend.utils import db_conn, cipher_suite
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
+from backend.blockchain_verify import verify_donation_record
 import re
 import os
 
@@ -39,7 +40,18 @@ def user_profile():
         }
 
     cursor.execute(
-        "SELECT donation_id, full_name, email, contact_number, amount, payment_status, payment_method, xendit_payment_id, donation_date, receipt_url, invoice_url, blockchain_tx FROM donations WHERE donor_id = %s ORDER BY donation_date DESC",
+        """SELECT  donation_id,
+            public_id,
+            donor_id,
+            full_name,
+            email,
+            contact_number,
+            birthday,
+            amount,
+            donation_status,
+            proof_image,receipt_reference,
+            blockchain_tx,
+            donation_date FROM temp_donations WHERE donor_id = %s ORDER BY donation_date DESC""",
         (user_id,)
     )
     donations = []
@@ -57,18 +69,19 @@ def user_profile():
         except Exception:
             decrypted_contact = ""
         donations.append({
-            'id': row['donation_id'],
+            'donation_id': row['donation_id'],
+            'public_id': row['public_id'],
+            'donor_id': row['donor_id'],
             'full_name': decrypted_full_name,
             'email': decrypted_email,
             'contact_number': decrypted_contact,
+            'birthday': row['birthday'],
             'amount': row['amount'],
-            'status': row['payment_status'],
-            'payment_method': row['payment_method'],
-            'receipt_no': row['xendit_payment_id'],
-            'date': row['donation_date'].strftime('%Y-%m-%d %H:%M:%S') if row['donation_date'] else '',
-            'receipt_url': row['receipt_url'],
-            'invoice_url': row.get('invoice_url', None),
-            'blockchain_tx': row.get('blockchain_tx', None)
+            'donation_status': row['donation_status'],
+            'proof_image': row['proof_image'],
+            'receipt_reference': row['receipt_reference'],
+            'blockchain_tx': row.get('blockchain_tx', ''),
+            'donation_date': row['donation_date']
         })
 
     cursor.close()
@@ -165,3 +178,12 @@ def user_upload_profile_image():
         return jsonify({'success': True, 'filename': filename, 'message': 'Profile image updated'})
     print("Invalid file type")
     return jsonify({'success': False, 'message': 'Invalid file type'}), 400
+
+@profile_bp.route('/verify_donation', methods=['POST'])
+def verify_donation():
+    data = request.get_json()
+    public_id = data.get('public_id')
+
+    result = verify_donation_record(public_id)
+
+    return jsonify(result)

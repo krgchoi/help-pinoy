@@ -52,11 +52,11 @@ def get_news(current_user):
 @verify_token
 def add_news(current_user):
     data = request.get_json()
-    title = data['title'] #
+    title = data['title'] 
     content = data['content'] 
-    author = data['author'] #
+    author = data['author'] 
     published_at = data['published_at']
-    category = data['category'] #
+    category = data['category'] 
     summary = data['summary']
     meta_title = data['meta_title']
     meta_description = data['meta_description']

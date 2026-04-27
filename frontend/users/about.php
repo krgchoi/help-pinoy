@@ -1,84 +1,194 @@
 <?php
 include './template/header.php';
 ?>
+
 <style>
     .text-container {
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.85);
+        border-radius: 5px;
     }
 </style>
 
-<section class="hero text-center d-flex align-items-center justify-content-center" style="background: url('../assets/img/disaster-hero.jpg') center/cover no-repeat; height: 60vh; position: relative;">
-    <div style="background: rgba(0,0,0,0.6); position:absolute; top:0; left:0; width:100%; height:100%;"></div>
-    <div class="container position-relative text-white" data-aos="fade-up" data-aos-duration="1000">
-        <h1 class="display-4 fw-bold">Disaster Relief Support</h1>
-        <p class="lead mb-4">Helping communities recover and rebuild after disasters through your generous support.</p>
-        <a href="donation_form.php" class="btn btn-warning btn-lg px-4 fw-bold">Donate Now</a>
+
+
+<!-- HERO SECTION -->
+<section class="hero text-center d-flex align-items-center justify-content-center"
+    style="background:url('<?= BASE_URL ?>assets/img/disaster-hero.jpg') center/cover no-repeat;height:60vh;position:relative;">
+
+    <div style="background:rgba(0,0,0,0.6);position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+
+    <div class="container position-relative text-white" data-aos="fade-up">
+        <h1 class="display-4 fw-bold">Liga ng mga Barangay</h1>
+
+        <p class="lead mb-4">
+            Strengthening local governance and empowering barangays to serve communities better.
+        </p>
+
+        <a href="<?= BASE_URL ?>contact.php" class="btn btn-warning btn-lg px-4 fw-bold">
+            Learn More
+        </a>
+
     </div>
 </section>
 
-<section class="container py-5" style="background-color: white;">
+
+
+<!-- WHAT WE DO -->
+<section class="container py-5" style="background:white;">
     <div class="text-center mb-5" data-aos="fade-up">
-        <h2 class="fw-bold">How We Help During Disasters</h2>
-        <p class="text-muted">Your donation provides life-saving assistance to those in need.</p>
+
+        <h2 class="fw-bold">What the Liga ng mga Barangay Does</h2>
+
+        <p class="text-muted">
+            The Liga ng mga Barangay serves as the official organization of all barangays in the Philippines,
+            providing representation, coordination, and leadership among barangay officials.
+        </p>
+
     </div>
+
+
     <div class="row g-4 text-center">
+
         <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+
             <div class="p-4 shadow rounded bg-white h-100">
-                <i class="fas fa-water fa-3x text-primary mb-3"></i>
-                <h4 class="fw-bold">Emergency Supplies</h4>
-                <p class="text-muted">Providing food, clean water, and hygiene kits to affected families.</p>
+
+                <i class="fas fa-users fa-3x text-primary mb-3"></i>
+
+                <h4 class="fw-bold">Community Leadership</h4>
+
+                <p class="text-muted">
+                    Promoting leadership among barangay officials and ensuring effective governance in local communities.
+                </p>
+
             </div>
         </div>
+
+
+
         <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
+
             <div class="p-4 shadow rounded bg-white h-100">
-                <i class="fas fa-clinic-medical fa-3x text-primary mb-3"></i>
-                <h4 class="fw-bold">Medical Assistance</h4>
-                <p class="text-muted">Delivering first aid and healthcare services in disaster-stricken areas.</p>
+
+                <i class="fas fa-handshake fa-3x text-primary mb-3"></i>
+
+                <h4 class="fw-bold">Coordination & Representation</h4>
+
+                <p class="text-muted">
+                    Acting as the collective voice of barangays and representing their concerns at municipal, city, and national levels.
+                </p>
+
             </div>
         </div>
+
+
+
         <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300">
+
             <div class="p-4 shadow rounded bg-white h-100">
-                <i class="fas fa-home fa-3x text-primary mb-3"></i>
-                <h4 class="fw-bold">Shelter Support</h4>
-                <p class="text-muted">Setting up temporary shelters to keep families safe and secure.</p>
+
+                <i class="fas fa-balance-scale fa-3x text-primary mb-3"></i>
+
+                <h4 class="fw-bold">Policy Support</h4>
+
+                <p class="text-muted">
+                    Supporting policies and programs that strengthen barangay administration and improve public services.
+                </p>
+
             </div>
         </div>
+
     </div>
 </section>
 
+
+
+<!-- MISSION SECTION -->
 <section class="py-5 bg-light" id="mission">
-    <div class=" d-flex flex-column flex-lg-row align-items-center" data-aos="fade-up">
+
+    <div class="container d-flex flex-column flex-lg-row align-items-center" data-aos="fade-up">
+
         <div class="col-lg-6 mb-4 mb-lg-0">
-            <img src="../assets/img/mission-disaster.jpg" alt="Mission" class="img-fluid rounded shadow">
+
+            <img src="<?= BASE_URL ?>assets/img/mission-disaster.jpg"
+                class="img-fluid rounded shadow"
+                alt="Liga Mission">
+
         </div>
+
+
+
         <div class="col-lg-6 ps-lg-5">
+
             <h2 class="fw-bold mb-3">Our Mission</h2>
-            <p class="text-muted mb-4">We aim to provide immediate disaster relief and long-term recovery assistance to affected communities. Your support helps deliver life-saving aid and rebuild lives.</p>
+
+            <p class="text-muted mb-4">
+
+                The Liga ng mga Barangay aims to strengthen grassroots leadership,
+                promote cooperation among barangays, and support programs that improve
+                community development and public welfare.
+
+            </p>
+
+
             <ul class="list-unstyled">
-                <li><i class="fas fa-check-circle text-primary me-2"></i> Quick response during disasters</li>
-                <li><i class="fas fa-check-circle text-primary me-2"></i> Emergency relief and medical care</li>
-                <li><i class="fas fa-check-circle text-primary me-2"></i> Support for recovery and rebuilding</li>
+
+                <li><i class="fas fa-check-circle text-primary me-2"></i>Strengthening barangay leadership</li>
+
+                <li><i class="fas fa-check-circle text-primary me-2"></i>Encouraging collaboration between communities</li>
+
+                <li><i class="fas fa-check-circle text-primary me-2"></i>Supporting local development initiatives</li>
+
             </ul>
-            <a href="donation_form.php" class="btn btn-primary mt-3">Support Our Mission</a>
+
+
+            <a href="<?= BASE_URL ?>contact.php" class="btn btn-primary mt-3">
+                Get Involved
+            </a>
+
         </div>
+
     </div>
 </section>
 
+
+
+<!-- CALL TO ACTION -->
 <section class="text-center bg-primary text-white py-5" data-aos="fade-up">
-    <h2 class="fw-bold mb-3">Join Us in Making a Difference</h2>
-    <p class="mb-4">Together, we can save lives and restore hope to communities in need.</p>
-    <a href="donation_form.php" class="btn btn-light btn-lg px-4 fw-bold">Donate Now</a>
+
+    <h2 class="fw-bold mb-3">Building Stronger Communities Together</h2>
+
+    <p class="mb-4">
+        Through cooperation, leadership, and public service,
+        the Liga ng mga Barangay continues to empower communities across the nation.
+    </p>
+
+    <a href="<?= BASE_URL ?>contact.php"
+        class="btn btn-light btn-lg px-4 fw-bold">
+
+        Contact Us
+
+    </a>
+
 </section>
+
+
 
 <?php
 include './template/footer.php';
 ?>
 
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
 <script>
-    AOS.init();
+    AOS.init({
+        once: true,
+        duration: 1000
+    });
 </script>
+
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>

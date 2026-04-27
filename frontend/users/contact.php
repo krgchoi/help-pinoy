@@ -1,4 +1,3 @@
-
 <?php include './template/header.php'; ?>
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
@@ -229,7 +228,9 @@
     }
 
     @keyframes spin {
-        to { transform: rotate(360deg); }
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     /* Success/Error Messages */
@@ -328,7 +329,7 @@
                 <div class="col-lg-6 contact-form-section">
                     <h2>Send us a Message</h2>
                     <p class="lead">Fill out the form below and we'll get back to you shortly.</p>
-                    
+
                     <form action="#" method="post" id="contactForm">
                         <div class="form-group">
                             <label class="form-label">
@@ -415,32 +416,32 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
-    AOS.init({ 
-        once: true, 
+    AOS.init({
+        once: true,
         duration: 1000,
-        offset: 100 
+        offset: 100
     });
 
     // Form submission handling
     document.getElementById('contactForm').addEventListener('submit', function(e) {
         const button = document.getElementById('submitButton');
         const buttonText = document.getElementById('buttonText');
-        
+
         // Show loading state
         button.classList.add('btn-loading');
         buttonText.textContent = 'Sending...';
         button.disabled = true;
-        
+
         // In a real application, you would have AJAX submission here
         // For now, we'll simulate a successful submission
         setTimeout(() => {
             // Remove loading state (in real app, do this after server response)
             button.classList.remove('btn-loading');
             buttonText.textContent = 'Message Sent!';
-            
+
             // Reset form (optional)
             // this.reset();
-            
+
             // Re-enable button after 3 seconds
             setTimeout(() => {
                 button.disabled = false;

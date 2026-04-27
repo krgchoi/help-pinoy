@@ -5,7 +5,8 @@ $url = "http://localhost:5000/admin/news";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "get-token: $jwt_token"
+    'Content-Type: application/json',
+    "Authorization: Bearer $jwt_token"
 ]);
 
 $response = curl_exec($ch);
@@ -187,6 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -363,14 +365,16 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border-radius: 8px;
             border: 2px solid #e9ecef;
             padding: 10px 15px;
             transition: var(--transition);
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
         }
@@ -419,7 +423,8 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
             font-weight: 500;
         }
 
-        .filter-btn:hover, .filter-btn.active {
+        .filter-btn:hover,
+        .filter-btn.active {
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
@@ -464,11 +469,11 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
             .stats-card .card-value {
                 font-size: 1.5rem;
             }
-            
+
             .table thead {
                 display: none;
             }
-            
+
             .table tbody tr {
                 display: block;
                 margin-bottom: 1rem;
@@ -476,14 +481,14 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                 border-radius: var(--border-radius);
                 padding: 1rem;
             }
-            
+
             .table tbody td {
                 display: block;
                 text-align: right;
                 padding: 0.5rem 0;
                 border: none;
             }
-            
+
             .table tbody td::before {
                 content: attr(data-label);
                 float: left;
@@ -493,6 +498,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
         }
     </style>
 </head>
+
 <body>
     <!-- Dashboard Header -->
     <div class="dashboard-header">
@@ -523,53 +529,53 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="card-value"><?php
-                        $categoryCount = [];
-                        if (!empty($data)) {
-                            foreach ($data as $news) {
-                                $category = $news['category'];
-                                if (!isset($categoryCount[$category])) {
-                                    $categoryCount[$category] = 0;
-                                }
-                                $categoryCount[$category]++;
-                            }
-                        }
-                        echo count($categoryCount);
-                    ?></div>
+                                            $categoryCount = [];
+                                            if (!empty($data)) {
+                                                foreach ($data as $news) {
+                                                    $category = $news['category'];
+                                                    if (!isset($categoryCount[$category])) {
+                                                        $categoryCount[$category] = 0;
+                                                    }
+                                                    $categoryCount[$category]++;
+                                                }
+                                            }
+                                            echo count($categoryCount);
+                                            ?></div>
                     <div class="card-label">Categories</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="card-value"><?php
-                        $authorCount = [];
-                        if (!empty($data)) {
-                            foreach ($data as $news) {
-                                $author = $news['author'];
-                                if (!isset($authorCount[$author])) {
-                                    $authorCount[$author] = 0;
-                                }
-                                $authorCount[$author]++;
-                            }
-                        }
-                        echo count($authorCount);
-                    ?></div>
+                                            $authorCount = [];
+                                            if (!empty($data)) {
+                                                foreach ($data as $news) {
+                                                    $author = $news['author'];
+                                                    if (!isset($authorCount[$author])) {
+                                                        $authorCount[$author] = 0;
+                                                    }
+                                                    $authorCount[$author]++;
+                                                }
+                                            }
+                                            echo count($authorCount);
+                                            ?></div>
                     <div class="card-label">Authors</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="card-value"><?php
-                        $recentCount = 0;
-                        if (!empty($data)) {
-                            $oneWeekAgo = date('Y-m-d', strtotime('-1 week'));
-                            foreach ($data as $news) {
-                                if ($news['published_at'] >= $oneWeekAgo) {
-                                    $recentCount++;
-                                }
-                            }
-                        }
-                        echo $recentCount;
-                    ?></div>
+                                            $recentCount = 0;
+                                            if (!empty($data)) {
+                                                $oneWeekAgo = date('Y-m-d', strtotime('-1 week'));
+                                                foreach ($data as $news) {
+                                                    if ($news['published_at'] >= $oneWeekAgo) {
+                                                        $recentCount++;
+                                                    }
+                                                }
+                                            }
+                                            echo $recentCount;
+                                            ?></div>
                     <div class="card-label">Last 7 Days</div>
                 </div>
             </div>
@@ -621,8 +627,8 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                             <tr data-category="<?php echo htmlspecialchars($news['category']); ?>">
                                 <td data-label="Image">
                                     <?php if (!empty($news['image_url'])): ?>
-                                        <img src="http://localhost:5000/static/news_img/<?php echo htmlspecialchars($news['image_url']); ?>" 
-                                             alt="News Image" class="news-image">
+                                        <img src="http://localhost:5000/static/news_img/<?php echo htmlspecialchars($news['image_url']); ?>"
+                                            alt="News Image" class="news-image">
                                     <?php else: ?>
                                         <div class="news-image bg-light d-flex align-items-center justify-content-center">
                                             <i class="bi bi-image text-muted"></i>
@@ -653,14 +659,14 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                                 </td>
                                 <td data-label="Actions">
                                     <button class="btn btn-action btn-edit me-2" data-bs-toggle="modal"
-                                            data-bs-target="#editNews<?php echo $news['news_id']; ?>" title="Edit News">
+                                        data-bs-target="#editNews<?php echo $news['news_id']; ?>" title="Edit News">
                                         <i class="bi bi-pencil me-1"></i> Edit
                                     </button>
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="news_id" value="<?php echo htmlspecialchars($news['news_id']); ?>">
-                                        <button type="submit" name="delete_news" class="btn btn-action btn-delete" 
-                                                onclick="return confirm('Are you sure you want to delete this news article? This action cannot be undone.')" 
-                                                title="Delete News">
+                                        <button type="submit" name="delete_news" class="btn btn-action btn-delete"
+                                            onclick="return confirm('Are you sure you want to delete this news article? This action cannot be undone.')"
+                                            title="Delete News">
                                             <i class="bi bi-trash me-1"></i> Delete
                                         </button>
                                     </form>
@@ -683,14 +689,14 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                     <?php endif; ?>
                 </tbody>
             </table>
-            
+
             <!-- Pagination -->
             <?php if (!empty($data)): ?>
-            <div class="p-3 border-top">
-                <nav>
-                    <ul class="pagination justify-content-center mb-0" id="newsTablePagination"></ul>
-                </nav>
-            </div>
+                <div class="p-3 border-top">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0" id="newsTablePagination"></ul>
+                    </nav>
+                </div>
             <?php endif; ?>
         </div>
     </div>
@@ -712,30 +718,30 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                                     <img src="default.jpg" alt="News Image" class="image-preview" id="previewImageAdd">
                                     <div class="mb-3">
                                         <label class="form-label fw-medium">Article Image</label>
-                                        <input type="file" name="image" accept="image/*" class="form-control" 
-                                               onchange="previewImageGeneric(this, 'previewImageAdd')">
+                                        <input type="file" name="image" accept="image/*" class="form-control"
+                                            onchange="previewImageGeneric(this, 'previewImageAdd')">
                                     </div>
                                     <small class="text-muted">Recommended: 800x450px, JPG/PNG format</small>
                                 </div>
                             </div>
-                            
+
                             <!-- Basic Info -->
                             <div class="col-md-8">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-medium">Title</label>
-                                        <input type="text" class="form-control" name="title" required 
-                                               placeholder="Enter article title">
+                                        <input type="text" class="form-control" name="title" required
+                                            placeholder="Enter article title">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-medium">Author</label>
-                                        <input type="text" class="form-control" name="author" required 
-                                               placeholder="Enter author name">
+                                        <input type="text" class="form-control" name="author" required
+                                            placeholder="Enter author name">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-medium">Category</label>
-                                        <input type="text" class="form-control" name="category" required 
-                                               placeholder="Enter category">
+                                        <input type="text" class="form-control" name="category" required
+                                            placeholder="Enter category">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-medium">Publish Date</label>
@@ -744,38 +750,38 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- SEO Fields -->
                         <div class="row mt-3">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-medium">Meta Title</label>
-                                <input type="text" class="form-control" name="meta_title" required 
-                                       placeholder="Enter meta title for SEO">
+                                <input type="text" class="form-control" name="meta_title" required
+                                    placeholder="Enter meta title for SEO">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-medium">Slug</label>
-                                <input type="text" class="form-control" name="slug" required 
-                                       placeholder="URL-friendly slug">
+                                <input type="text" class="form-control" name="slug" required
+                                    placeholder="URL-friendly slug">
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label fw-medium">Meta Description</label>
-                                <input type="text" class="form-control" name="meta_description" maxlength="160" required 
-                                       placeholder="Brief description for search engines">
+                                <input type="text" class="form-control" name="meta_description" maxlength="160" required
+                                    placeholder="Brief description for search engines">
                                 <div class="character-count">0/160 characters</div>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label fw-medium">Summary</label>
-                                <input type="text" class="form-control" name="summary" maxlength="160" required 
-                                       placeholder="Brief summary of the article">
+                                <input type="text" class="form-control" name="summary" maxlength="160" required
+                                    placeholder="Brief summary of the article">
                                 <div class="character-count">0/160 characters</div>
                             </div>
                         </div>
-                        
+
                         <!-- Content -->
                         <div class="mb-3">
                             <label class="form-label fw-medium">Content</label>
-                            <textarea class="form-control" name="content" rows="8" required 
-                                      placeholder="Write your article content here..."></textarea>
+                            <textarea class="form-control" name="content" rows="8" required
+                                placeholder="Write your article content here..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -805,76 +811,76 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                                     <!-- Image Upload -->
                                     <div class="col-md-4">
                                         <div class="image-upload-container">
-                                            <img src="<?php echo !empty($news['image_url']) ? 'http://localhost:5000/static/news_img/' . htmlspecialchars($news['image_url']) : 'default.jpg'; ?>" 
-                                                 alt="News Image" class="image-preview" id="previewImageEdit<?php echo $news['news_id']; ?>">
+                                            <img src="<?php echo !empty($news['image_url']) ? 'http://localhost:5000/static/news_img/' . htmlspecialchars($news['image_url']) : 'default.jpg'; ?>"
+                                                alt="News Image" class="image-preview" id="previewImageEdit<?php echo $news['news_id']; ?>">
                                             <div class="mb-3">
                                                 <label class="form-label fw-medium">Article Image</label>
-                                                <input type="file" name="image" accept="image/*" class="form-control" 
-                                                       onchange="previewImageGeneric(this, 'previewImageEdit<?php echo $news['news_id']; ?>')">
+                                                <input type="file" name="image" accept="image/*" class="form-control"
+                                                    onchange="previewImageGeneric(this, 'previewImageEdit<?php echo $news['news_id']; ?>')">
                                             </div>
                                             <small class="text-muted">Leave empty to keep current image</small>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Basic Info -->
                                     <div class="col-md-8">
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-medium">Title</label>
-                                                <input type="text" class="form-control" name="title" 
-                                                       value="<?php echo htmlspecialchars($news['title'], ENT_QUOTES, 'utf-8'); ?>" required>
+                                                <input type="text" class="form-control" name="title"
+                                                    value="<?php echo htmlspecialchars($news['title'], ENT_QUOTES, 'utf-8'); ?>" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-medium">Author</label>
-                                                <input type="text" class="form-control" name="author" 
-                                                       value="<?php echo htmlspecialchars($news['author'], ENT_QUOTES, 'utf-8'); ?>" required>
+                                                <input type="text" class="form-control" name="author"
+                                                    value="<?php echo htmlspecialchars($news['author'], ENT_QUOTES, 'utf-8'); ?>" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-medium">Category</label>
-                                                <input type="text" class="form-control" name="category" 
-                                                       value="<?php echo htmlspecialchars($news['category'], ENT_QUOTES, 'utf-8'); ?>" required>
+                                                <input type="text" class="form-control" name="category"
+                                                    value="<?php echo htmlspecialchars($news['category'], ENT_QUOTES, 'utf-8'); ?>" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-medium">Publish Date</label>
-                                                <input type="date" class="form-control" name="published_at" 
-                                                       value="<?php echo htmlspecialchars($news['published_at'], ENT_QUOTES, 'utf-8'); ?>" required>
+                                                <input type="date" class="form-control" name="published_at"
+                                                    value="<?php echo htmlspecialchars($news['published_at'], ENT_QUOTES, 'utf-8'); ?>" required>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- SEO Fields -->
                                 <div class="row mt-3">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-medium">Meta Title</label>
-                                        <input type="text" class="form-control" name="meta_title" 
-                                               value="<?php echo htmlspecialchars($news['meta_title'], ENT_QUOTES, 'utf-8'); ?>" required>
+                                        <input type="text" class="form-control" name="meta_title"
+                                            value="<?php echo htmlspecialchars($news['meta_title'], ENT_QUOTES, 'utf-8'); ?>" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-medium">Slug</label>
-                                        <input type="text" class="form-control" name="slug" 
-                                               value="<?php echo htmlspecialchars($news['slug'], ENT_QUOTES, 'utf-8'); ?>" required>
+                                        <input type="text" class="form-control" name="slug"
+                                            value="<?php echo htmlspecialchars($news['slug'], ENT_QUOTES, 'utf-8'); ?>" required>
                                     </div>
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label fw-medium">Meta Description</label>
-                                        <input type="text" class="form-control" name="meta_description" maxlength="160" 
-                                               value="<?php echo htmlspecialchars($news['meta_description'], ENT_QUOTES, 'utf-8'); ?>" required>
+                                        <input type="text" class="form-control" name="meta_description" maxlength="160"
+                                            value="<?php echo htmlspecialchars($news['meta_description'], ENT_QUOTES, 'utf-8'); ?>" required>
                                         <div class="character-count"><?php echo strlen($news['meta_description']); ?>/160 characters</div>
                                     </div>
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label fw-medium">Summary</label>
-                                        <input type="text" class="form-control" name="summary" maxlength="160" 
-                                               value="<?php echo htmlspecialchars($news['summary'], ENT_QUOTES, 'utf-8'); ?>" required>
+                                        <input type="text" class="form-control" name="summary" maxlength="160"
+                                            value="<?php echo htmlspecialchars($news['summary'], ENT_QUOTES, 'utf-8'); ?>" required>
                                         <div class="character-count"><?php echo strlen($news['summary']); ?>/160 characters</div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Content -->
                                 <div class="mb-3">
                                     <label class="form-label fw-medium">Content</label>
                                     <textarea class="form-control" name="content" rows="8" required><?php echo htmlspecialchars($news['content'], ENT_QUOTES, 'utf-8') ?></textarea>
                                 </div>
-                                
+
                                 <input type="hidden" name="news_id" value="<?php echo htmlspecialchars($news['news_id'], ENT_QUOTES, 'utf-8'); ?>">
                                 <input type="hidden" name="current_image_url" value="<?php echo htmlspecialchars($news['image_url'] ?? '', ENT_QUOTES, 'utf-8'); ?>">
                             </div>
@@ -897,20 +903,20 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
         searchInput.addEventListener('keyup', function() {
             const filter = searchInput.value.toLowerCase();
             const rows = document.querySelectorAll('#newsTable tbody tr');
-            
+
             let visibleCount = 0;
-            
+
             rows.forEach(row => {
                 const title = row.children[1].textContent.toLowerCase();
                 const author = row.children[2].textContent.toLowerCase();
                 const category = row.children[3].textContent.toLowerCase();
-                
+
                 const isVisible = title.includes(filter) || author.includes(filter) || category.includes(filter);
                 row.style.display = isVisible ? '' : 'none';
-                
+
                 if (isVisible) visibleCount++;
             });
-            
+
             // Update pagination after filtering
             if (visibleCount > 0) {
                 paginateTable('newsTable', 'newsTablePagination', 10);
@@ -923,10 +929,10 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                 // Update active state
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                
+
                 const filter = this.getAttribute('data-filter');
                 const rows = document.querySelectorAll('#newsTable tbody tr');
-                
+
                 rows.forEach(row => {
                     if (filter === 'all') {
                         row.style.display = '';
@@ -935,7 +941,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                         row.style.display = category === filter ? '' : 'none';
                     }
                 });
-                
+
                 // Update pagination after filtering
                 paginateTable('newsTable', 'newsTablePagination', 10);
             });
@@ -949,7 +955,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                 input.addEventListener('input', function() {
                     counter.textContent = this.value.length + '/160 characters';
                 });
-                
+
                 // Initialize count
                 counter.textContent = input.value.length + '/160 characters';
             }
@@ -976,18 +982,18 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
             const tbody = table.querySelector('tbody');
             const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.style.display !== 'none');
             const pagination = document.getElementById(paginationId);
-            
+
             if (rows.length === 0) return;
 
             function showPage(page) {
                 const start = (page - 1) * rowsPerPage;
                 const end = start + rowsPerPage;
-                
+
                 // Hide all rows first
                 document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
                     row.style.display = 'none';
                 });
-                
+
                 // Show only rows for current page
                 rows.forEach((row, i) => {
                     if (i >= start && i < end) {
@@ -999,9 +1005,9 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
             function renderPagination() {
                 pagination.innerHTML = '';
                 const pageCount = Math.ceil(rows.length / rowsPerPage);
-                
+
                 if (pageCount <= 1) return;
-                
+
                 // Previous button
                 const prevLi = document.createElement('li');
                 prevLi.className = 'page-item';
@@ -1018,7 +1024,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                 };
                 prevLi.appendChild(prevA);
                 pagination.appendChild(prevLi);
-                
+
                 // Page numbers
                 for (let i = 1; i <= pageCount; i++) {
                     const li = document.createElement('li');
@@ -1036,7 +1042,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                     li.appendChild(a);
                     pagination.appendChild(li);
                 }
-                
+
                 // Next button
                 const nextLi = document.createElement('li');
                 nextLi.className = 'page-item';
@@ -1053,7 +1059,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
                 };
                 nextLi.appendChild(nextA);
                 pagination.appendChild(nextLi);
-                
+
                 if (pagination.children.length > 0) pagination.children[1].classList.add('active');
             }
 
@@ -1069,4 +1075,5 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
 
     <?php include('./template/foot.php'); ?>
 </body>
+
 </html>

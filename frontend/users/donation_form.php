@@ -35,32 +35,93 @@ if (isset($_SESSION['user_id'])) {
     }
 }
 
+// if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//     $anonymous = isset($_POST["anonymous"]) ? true : false;
+
+//     if ($anonymous) {
+//         $donor_id = "";
+//         $full_name = "Anonymous Donor";
+//         $email = "anonymous@example.com";
+//         $contact_number = "0000000000";
+//         $birthday = date('Y-m-d');
+//     } else {
+//         $donor_id = htmlspecialchars(strip_tags(trim($_POST["donor_id"])));
+//         $full_name = htmlspecialchars(strip_tags(trim($_POST["full_name"])));
+//         $email = filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL);
+//         $contact_number = htmlspecialchars(strip_tags(trim($_POST["contact_number"])));
+//         $birthday = htmlspecialchars(strip_tags(trim($_POST["birthday"])));
+//     }
+//     $amount = (isset($_POST["amount_radio"]) && $_POST["amount_radio"] !== "custom")
+//         ? floatval($_POST["amount_radio"])
+//         : floatval($_POST["amount"]);
+
+//     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+//         $error = "Invalid email format.";
+//     } elseif ($amount <= 0) {
+//         $error = "Donation amount must be greater than zero.";
+//     } else {
+
+//         $json_data = json_encode([
+//             "donor_id" => $donor_id,
+//             "full_name" => $full_name,
+//             "email" => $email,
+//             "contact_number" => $contact_number,
+//             "birthday" => $birthday,
+//             "amount" => $amount
+//         ]);
+
+//         $flask_url = "http://localhost:5000/user/donation_form";
+//         $ch = curl_init($flask_url);
+//         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//         curl_setopt($ch, CURLOPT_POST, true);
+//         curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);
+//         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+//         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+//         $response = curl_exec($ch);
+//         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+//         curl_close($ch);
+
+//         if ($httpcode == 200) {
+//             $result = json_decode($response, true);
+//             $invoice_url = htmlspecialchars($result["invoice_url"]);
+//             header("Location: " . $invoice_url);
+//             exit();
+//         } else {
+//             $error = "Something went wrong. Please try again.";
+//         }
+//     }
+// }
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $anonymous = isset($_POST["anonymous"]) ? true : false;
+
+    $anonymous = isset($_POST["anonymous"]);
 
     if ($anonymous) {
-        $donor_id = "";
+        $donor_id = null;
         $full_name = "Anonymous Donor";
         $email = "anonymous@example.com";
-        $contact_number = "0000000000";
-        $birthday = date('Y-m-d');
+        $contact_number = "N/A";
+        $birthday = null;
     } else {
-        $donor_id = htmlspecialchars(strip_tags(trim($_POST["donor_id"])));
-        $full_name = htmlspecialchars(strip_tags(trim($_POST["full_name"])));
-        $email = filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL);
-        $contact_number = htmlspecialchars(strip_tags(trim($_POST["contact_number"])));
-        $birthday = htmlspecialchars(strip_tags(trim($_POST["birthday"])));
+        $donor_id = $_POST["donor_id"] ?? null;
+        $full_name = trim($_POST["full_name"]);
+        $email = trim($_POST["email"]);
+        $contact_number = trim($_POST["contact_number"]);
+        $birthday = $_POST["birthday"] ?? null;
     }
-    $amount = (isset($_POST["amount_radio"]) && $_POST["amount_radio"] !== "custom")
+
+    $amount = ($_POST["amount_radio"] !== "custom")
         ? floatval($_POST["amount_radio"])
         : floatval($_POST["amount"]);
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Invalid email format.";
-    } elseif ($amount <= 0) {
-        $error = "Donation amount must be greater than zero.";
+    // Basic validation
+    if ($amount <= 0) {
+        $error = "Invalid donation amount.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) && !$anonymous) {
+        $error = "Invalid email.";
     } else {
-      
+
         $json_data = json_encode([
             "donor_id" => $donor_id,
             "full_name" => $full_name,
@@ -70,25 +131,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             "amount" => $amount
         ]);
 
-        $flask_url = "http://localhost:5000/user/donation_form";
-        $ch = curl_init($flask_url);
+
+
+        $ch = curl_init('http://localhost:5000/user/donate');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
         $response = curl_exec($ch);
+
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
+
         if ($httpcode == 200) {
             $result = json_decode($response, true);
-            $invoice_url = htmlspecialchars($result["invoice_url"]);
-            header("Location: " . $invoice_url);
+
+            $public_id = $result["public_id"];
+
+            header("Location: upload_receipt.php?public_id=" . urlencode($public_id));
             exit();
         } else {
-            $error = "Something went wrong. Please try again.";
+            $error = "Failed to create donation.";
         }
     }
 }
@@ -97,6 +162,7 @@ ob_end_flush();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -119,7 +185,7 @@ ob_end_flush();
 
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-                        url('../assets/img/donation-banner2.jpg') no-repeat center center fixed;
+                url('../assets/img/donation-banner2.jpg') no-repeat center center fixed;
             background-size: cover;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
@@ -132,6 +198,7 @@ ob_end_flush();
             background-color: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
         }
+
         .transparent-navbar .nav-link,
         .transparent-navbar .navbar-brand,
         .transparent-navbar .btn {
@@ -244,8 +311,15 @@ ob_end_flush();
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .amount-grid {
@@ -378,11 +452,11 @@ ob_end_flush();
             border-radius: 50%;
         }
 
-        input:checked + .toggle-slider {
+        input:checked+.toggle-slider {
             background-color: var(--success-color);
         }
 
-        input:checked + .toggle-slider:before {
+        input:checked+.toggle-slider:before {
             transform: translateX(30px);
         }
 
@@ -483,23 +557,25 @@ ob_end_flush();
                 padding: 25px 20px;
                 margin: 20px;
             }
-            
+
             .amount-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .step-actions {
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .step-actions .btn {
                 width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
+
     <div class="container donation-container">
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
@@ -533,13 +609,13 @@ ob_end_flush();
                         </div>
                     <?php endif; ?>
 
-                    <form action="donation_form.php" method="post" id="donation-form">
+                    <form method="post" id="donation-form">
                         <input type="hidden" name="donor_id" value="<?php echo htmlspecialchars($default_donor_id); ?>">
 
                         <!-- Step 1: Amount Selection -->
                         <div class="form-step active">
                             <h4 class="mb-4"><i class="fas fa-coins me-2 text-warning"></i>Select Donation Amount</h4>
-                            
+
                             <div class="amount-grid">
                                 <div class="amount-option" data-amount="100">₱100</div>
                                 <div class="amount-option" data-amount="200">₱200</div>
@@ -552,8 +628,8 @@ ob_end_flush();
                             <div class="custom-amount-container">
                                 <div class="input-group">
                                     <span class="input-group-text">₱</span>
-                                    <input type="number" name="amount" id="amount" class="form-control custom-amount-input" 
-                                           placeholder="Enter custom amount" min="1" step="1">
+                                    <input type="number" name="amount" id="amount" class="form-control custom-amount-input"
+                                        placeholder="Enter custom amount" min="1" step="1">
                                 </div>
                             </div>
                             <input type="hidden" name="amount_radio" id="amount_radio">
@@ -569,7 +645,7 @@ ob_end_flush();
                         <!-- Step 2: Personal Information -->
                         <div class="form-step">
                             <h4 class="mb-4"><i class="fas fa-user me-2 text-primary"></i>Your Information</h4>
-                            
+
                             <div class="anonymous-toggle">
                                 <label class="toggle-switch">
                                     <input type="checkbox" id="anonymous" name="anonymous">
@@ -617,7 +693,7 @@ ob_end_flush();
                         <!-- Step 3: Confirmation -->
                         <div class="form-step">
                             <h4 class="mb-4"><i class="fas fa-check-circle me-2 text-success"></i>Confirm Your Donation</h4>
-                            
+
                             <div class="impact-message">
                                 <i class="fas fa-hands-helping"></i>
                                 <h5>Thank You for Your Generosity!</h5>
@@ -635,6 +711,7 @@ ob_end_flush();
                                 <button type="submit" class="btn btn-success">
                                     <i class="fas fa-heart me-2"></i>Complete Donation
                                 </button>
+
                             </div>
                         </div>
                     </form>
@@ -644,7 +721,7 @@ ob_end_flush();
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const amountOptions = document.querySelectorAll('.amount-option');
             const customAmountInput = document.getElementById('amount');
             const amountRadioInput = document.getElementById('amount_radio');
@@ -674,8 +751,8 @@ ob_end_flush();
             // Anonymous toggle
             const anonymousCheckbox = document.getElementById('anonymous');
             const personalFields = ['full_name', 'email', 'contact_number', 'birthday'];
-            
-            anonymousCheckbox.addEventListener('change', function () {
+
+            anonymousCheckbox.addEventListener('change', function() {
                 if (this.checked) {
                     personalFields.forEach(id => {
                         const field = document.getElementById(id);
@@ -726,14 +803,14 @@ ob_end_flush();
                         return false;
                     }
                 }
-                
+
                 if (step === 1) {
                     const anonymous = anonymousCheckbox.checked;
                     if (!anonymous) {
                         const fullName = document.getElementById('full_name').value.trim();
                         const email = document.getElementById('email').value.trim();
                         const contact = document.getElementById('contact_number').value.trim();
-                        
+
                         if (!fullName) {
                             showAlert('Full Name is required.');
                             return false;
@@ -746,7 +823,7 @@ ob_end_flush();
                             showAlert('Contact Number is required.');
                             return false;
                         }
-                        
+
                         // Basic email validation
                         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                         if (!emailRegex.test(email)) {
@@ -755,7 +832,7 @@ ob_end_flush();
                         }
                     }
                 }
-                
+
                 return true;
             }
 
@@ -768,11 +845,11 @@ ob_end_flush();
                     alert.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>`;
                     document.querySelector('.donation-form-box').insertBefore(alert, document.querySelector('form'));
                 }
-                
+
                 const messageSpan = document.createElement('span');
                 messageSpan.textContent = message;
                 alert.appendChild(messageSpan);
-                
+
                 // Remove alert after 5 seconds
                 setTimeout(() => {
                     alert.remove();
@@ -780,10 +857,10 @@ ob_end_flush();
             }
 
             function updateConfirmation() {
-                const amount = amountRadioInput.value === 'custom' 
-                    ? customAmountInput.value 
-                    : amountRadioInput.value;
-                
+                const amount = amountRadioInput.value === 'custom' ?
+                    customAmountInput.value :
+                    amountRadioInput.value;
+
                 const anonymous = anonymousCheckbox.checked;
                 const name = anonymous ? 'Anonymous Donor' : document.getElementById('full_name').value;
                 const email = anonymous ? 'anonymous@example.com' : document.getElementById('email').value;
@@ -812,11 +889,11 @@ ob_end_flush();
             nextBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     if (!validateStep(currentStep)) return;
-                    
+
                     if (currentStep === 1) {
                         updateConfirmation();
                     }
-                    
+
                     currentStep++;
                     if (currentStep >= steps.length) currentStep = steps.length - 1;
                     updateStep();
@@ -846,4 +923,5 @@ ob_end_flush();
         });
     </script>
 </body>
+
 </html>

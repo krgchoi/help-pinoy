@@ -379,8 +379,13 @@ $result = json_decode($response, true);
     }
 
     @keyframes loading {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
     }
 </style>
 
@@ -408,13 +413,15 @@ $result = json_decode($response, true);
                     <article class="news-card">
                         <div class="news-card-image">
                             <?php if (!empty($news['image_url'])): ?>
-                                <img src="http://localhost:5000/static/news_img/<?php echo htmlspecialchars($news['image_url']); ?>" 
-                                     alt="<?php echo htmlspecialchars($news['title']); ?>"
-                                     onerror="this.src='../assets/img/default-news.jpg'">
+                                <img
+                                    src="<?= API_BASE ?>/static/news_img/<?= htmlspecialchars($news['image_url']); ?>"
+                                    alt="<?= htmlspecialchars($news['title']); ?>"
+                                    onerror="this.src='<?= BASE_URL ?>assets/img/default-news.jpg'">
+
                             <?php else: ?>
-                                <img src="../assets/img/default-news.jpg" alt="Default News Image">
+                                <img src="https://api.helppinoy.org/static/news_img/default_image.png" alt="Default News Image">
                             <?php endif; ?>
-                            
+
                             <?php if (!empty($news['category'])): ?>
                                 <div class="news-card-category">
                                     <?php echo htmlspecialchars($news['category']); ?>
@@ -426,15 +433,15 @@ $result = json_decode($response, true);
                             <h3 class="news-card-title">
                                 <?php echo htmlspecialchars($news['title']); ?>
                             </h3>
-                            
+
                             <p class="news-card-summary">
                                 <?php echo htmlspecialchars($news['summary']); ?>
                             </p>
-                            
-                            <a href="single_news.php?slug=<?php echo urlencode($news['slug']); ?>" class="news-read-more">
+
+                            <a href="<?= BASE_URL ?>single_news.php?slug=<?= urlencode($news['slug']); ?>" class="news-read-more">
                                 Read Full Story <i class="fas fa-arrow-right"></i>
                             </a>
-                            
+
                             <div class="news-card-meta">
                                 <div class="news-card-author">
                                     <i class="fas fa-user"></i>
@@ -457,7 +464,7 @@ $result = json_decode($response, true);
                 </div>
                 <h3>No News Available</h3>
                 <p>There are no news articles at the moment. Please check back later for updates.</p>
-                <a href="index.php" class="btn btn-primary">Return to Homepage</a>
+                <a href="<?= BASE_URL ?>index.php" class="btn btn-primary">Return to Homepage</a>
             </div>
         <?php endif; ?>
     </div>
@@ -479,11 +486,11 @@ $result = json_decode($response, true);
             img.addEventListener('load', function() {
                 this.style.opacity = '1';
             });
-            
+
             // Set initial opacity for fade-in effect
             img.style.opacity = '0';
             img.style.transition = 'opacity 0.3s ease';
-            
+
             // If image is already loaded (cached)
             if (img.complete) {
                 img.style.opacity = '1';

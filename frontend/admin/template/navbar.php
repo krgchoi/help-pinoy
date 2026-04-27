@@ -1,15 +1,16 @@
 <?php
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-if (!isset($_SESSION['jwt_token'])) {
-    echo "Session token not set";
+if (!isset($_SESSION['access_token'])) {
     header("Location: admin_login.php");
     exit();
 }
 
-$jwt_token = $_SESSION['jwt_token'];
+$jwt_token = $_SESSION['access_token'];
 ?>
 
 <!DOCTYPE html>
@@ -188,10 +189,16 @@ $jwt_token = $_SESSION['jwt_token'];
         }
 
         .sidebar-link i {
-            font-size: 1.3rem;
-            width: 24px;
-            text-align: center;
-            transition: all 0.3s ease;
+            width: 28px;
+            /* fixed icon column */
+            min-width: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            line-height: 1;
+            vertical-align: middle;
+            flex-shrink: 0;
         }
 
         .sidebar-link:hover i {
@@ -234,7 +241,7 @@ $jwt_token = $_SESSION['jwt_token'];
             min-height: 100vh;
         }
 
-        #sidebar.expand ~ .main {
+        #sidebar.expand~.main {
             margin-left: var(--sidebar-collapsed);
         }
 
@@ -351,8 +358,15 @@ $jwt_token = $_SESSION['jwt_token'];
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .slide-in {
@@ -360,8 +374,13 @@ $jwt_token = $_SESSION['jwt_token'];
         }
 
         @keyframes slideIn {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
+            from {
+                transform: translateX(-100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
         }
 
         /* Active State Management */
@@ -393,26 +412,93 @@ $jwt_token = $_SESSION['jwt_token'];
 </head>
 
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Sidebar Toggle Functionality - FIXED
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById("sidebarToggle");
+            const mobileToggle = document.getElementById("mobileToggle");
+            const sidebar = document.getElementById("sidebar");
+
+            // Desktop toggle (expand/collapse)
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener("click", function() {
+                    sidebar.classList.toggle("expand");
+                });
+            }
+
+            // Mobile toggle (show/hide)
+            if (mobileToggle) {
+                mobileToggle.addEventListener("click", function() {
+                    sidebar.classList.toggle("mobile-open");
+                });
+            }
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768) {
+                    const isClickInsideSidebar = sidebar.contains(event.target);
+                    const isClickOnMobileToggle = mobileToggle.contains(event.target);
+
+                    if (!isClickInsideSidebar && !isClickOnMobileToggle && sidebar.classList.contains('mobile-open')) {
+                        sidebar.classList.remove('mobile-open');
+                    }
+                }
+            });
+
+            // Auto-hide sidebar on mobile when navigating
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('mobile-open');
+                    }
+                });
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+        });
+
+        // Search functionality (if needed)
+        $(document).ready(function() {
+            $("#searchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("table tbody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
     <div class="wrapper">
         <!-- Sidebar -->
         <aside id="sidebar">
             <div class="sidebar-header">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center justify-content-between gap-3">
+
                     <button class="toggle-btn" type="button" id="sidebarToggle">
                         <i class="bi bi-list"></i>
                     </button>
-                </div>
-                <div class="sidebar-logo">
-                    <a href="#">
-                        <i class="fas fa-hands-helping"></i>
-                        <span>Help Pinoy</span>
-                    </a>
+
+                    <div class="sidebar-logo">
+                        <a href="#">
+                            <i class="fas fa-hands-helping"></i>
+                            <span>Help Pinoy</span>
+                        </a>
+                    </div>
+
                 </div>
             </div>
-            
+
             <ul class="sidebar-nav">
                 <li class="sidebar-item">
-                    <a href="dashboard.php" class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
+                    <a href="index.php" class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>">
                         <i class="bi bi-bar-chart"></i>
                         <span>Overview</span>
                     </a>
@@ -442,7 +528,7 @@ $jwt_token = $_SESSION['jwt_token'];
                     </a>
                 </li>
             </ul>
-            
+
             <div class="sidebar-footer">
                 <a href="admin_logout.php" class="sidebar-link">
                     <i class="bi bi-box-arrow-right"></i>

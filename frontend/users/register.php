@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     if ($password !== $confirm_password) {
         $error = 'Passwords do not match.';
     } else {
-
         $data = json_encode([
             'name' => $name,
             'email' => $email,
@@ -37,37 +36,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curl_error = curl_error($ch);
-        
+
         curl_close($ch);
-        
-        // Debug: Log the response
-        error_log("HTTP Code: " . $http_code);
-        error_log("CURL Error: " . $curl_error);
-        error_log("API Response: " . $response);
+
 
         if ($response === false) {
             $error = 'Server unavailable. Please try again later. CURL Error: ' . $curl_error;
         } else {
             $result = json_decode($response, true);
-            
+
             // Debug: Log the decoded result
             error_log("Decoded Result: " . print_r($result, true));
 
             if ($result && isset($result['status']) && $result['status'] === 'success') {
                 // Debug
                 error_log("SUCCESS - Redirecting to OTP page");
-                
+
                 echo "<script>
                         alert('Registration successful! Check your email for OTP.');
-                        window.location.href = '/help_pinoy/frontend/users/otp_verification2.php?email=" . urlencode($email) . "';
+                        window.location.href = '/otp_verification2.php?email=" . urlencode($email) . "';
                       </script>";
                 exit();
-
             } else {
                 // Check what exactly is in the response
                 $error = isset($result['message']) ? $result['message'] : 'Registration failed. No message from server.';
                 if (isset($result['status'])) {
-                    $error .= ' Status: ' . $result['status'];
+                    $error;
                 }
                 if ($http_code !== 200) {
                     $error .= ' HTTP Code: ' . $http_code;
@@ -117,13 +111,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .register-left {
-            background: linear-gradient(135deg, rgba(0, 51, 102, 0.9) 0%, rgba(0, 87, 183, 0.9) 100%), 
-                        url('https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg') no-repeat center center;
+            background: linear-gradient(135deg, rgba(0, 51, 102, 0.9) 0%, rgba(0, 87, 183, 0.9) 100%),
+                url('https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg') no-repeat center center;
             background-size: cover;
             position: relative;
             display: flex;
@@ -261,10 +262,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             transition: all 0.3s ease;
         }
 
-        .strength-weak { background: #dc3545; width: 25%; }
-        .strength-fair { background: #fd7e14; width: 50%; }
-        .strength-good { background: #ffc107; width: 75%; }
-        .strength-strong { background: #198754; width: 100%; }
+        .strength-weak {
+            background: #dc3545;
+            width: 25%;
+        }
+
+        .strength-fair {
+            background: #fd7e14;
+            width: 50%;
+        }
+
+        .strength-good {
+            background: #ffc107;
+            width: 75%;
+        }
+
+        .strength-strong {
+            background: #198754;
+            width: 100%;
+        }
 
         .btn-register {
             background: linear-gradient(135deg, var(--accent-yellow) 0%, #ffd700 100%);
@@ -328,16 +344,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             .register-wrapper {
                 flex-direction: column;
             }
-            
+
             .register-left {
                 display: none;
             }
-            
+
             .register-right {
                 width: 100%;
                 padding: 30px 25px;
             }
-            
+
             .brand-link {
                 font-size: 1.8rem;
             }
@@ -347,11 +363,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             body {
                 padding: 10px;
             }
-            
+
             .register-right {
                 padding: 25px 20px;
             }
-            
+
             .form-header h2 {
                 font-size: 1.5rem;
             }
@@ -379,7 +395,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Password requirements list */
@@ -416,7 +434,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             <div class="register-left-content">
                 <h3>Join Our Community</h3>
                 <p>Be part of the change and make a difference in the Philippines</p>
-                
+
                 <div class="benefits-list">
                     <div class="benefit-item">
                         <div class="benefit-icon">
@@ -467,7 +485,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     <?php echo htmlspecialchars($error); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
 
@@ -482,8 +499,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 <div class="row">
                     <div class="col-12">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="name" name="name" 
-                                   placeholder="Full Name" value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" required>
+                            <input type="text" class="form-control" id="name" name="name"
+                                placeholder="Full Name" value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" required>
                             <label for="name"><i class="fas fa-user me-2"></i>Full Name</label>
                         </div>
                     </div>
@@ -492,15 +509,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   placeholder="Email Address" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+                            <input type="email" class="form-control" id="email" name="email"
+                                placeholder="Email Address" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
                             <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="tel" class="form-control" id="contact_number" name="contact_number" 
-                                   placeholder="Contact Number" value="<?php echo isset($_POST['contact_number']) ? htmlspecialchars($_POST['contact_number']) : ''; ?>" required>
+                            <input type="tel" class="form-control" id="contact_number" name="contact_number"
+                                placeholder="Contact Number" value="<?php echo isset($_POST['contact_number']) ? htmlspecialchars($_POST['contact_number']) : ''; ?>" required>
                             <label for="contact_number"><i class="fas fa-phone me-2"></i>Contact Number</label>
                         </div>
                     </div>
@@ -517,8 +534,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 </div>
 
                 <div class="form-floating position-relative">
-                    <input type="password" class="form-control" id="password" name="password" 
-                           placeholder="Password" required>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Password" required>
                     <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
                     <button type="button" class="password-toggle" id="togglePassword">
                         <i class="fas fa-eye"></i>
@@ -534,8 +551,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 </div>
 
                 <div class="form-floating position-relative">
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
-                           placeholder="Confirm Password" required>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password"
+                        placeholder="Confirm Password" required>
                     <label for="confirm_password"><i class="fas fa-lock me-2"></i>Confirm Password</label>
                     <button type="button" class="password-toggle" id="toggleConfirmPassword">
                         <i class="fas fa-eye"></i>
@@ -549,7 +566,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             </form>
 
             <div class="login-link">
-                <p>Already have an account? 
+                <p>Already have an account?
                     <a href="user_login.php">Sign in here</a>
                 </p>
             </div>
@@ -562,7 +579,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const icon = this.querySelector('i');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 icon.classList.remove('fa-eye');
@@ -577,7 +594,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('confirm_password');
             const icon = this.querySelector('i');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 icon.classList.remove('fa-eye');
@@ -594,21 +611,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             const password = this.value;
             const strengthBar = document.getElementById('passwordStrength');
             const requirements = document.getElementById('passwordRequirements');
-            
+
             // Check requirements
             const hasLength = password.length >= 8;
             const hasUpper = /[A-Z]/.test(password);
             const hasLower = /[a-z]/.test(password);
             const hasNumber = /[0-9]/.test(password);
             const hasSpecial = /[\W_]/.test(password);
-            
+
             // Update requirement indicators
             document.getElementById('reqLength').className = hasLength ? 'requirement met' : 'requirement unmet';
             document.getElementById('reqUpper').className = hasUpper ? 'requirement met' : 'requirement unmet';
             document.getElementById('reqLower').className = hasLower ? 'requirement met' : 'requirement unmet';
             document.getElementById('reqNumber').className = hasNumber ? 'requirement met' : 'requirement unmet';
             document.getElementById('reqSpecial').className = hasSpecial ? 'requirement met' : 'requirement unmet';
-            
+
             // Calculate strength
             let strength = 0;
             if (hasLength) strength++;
@@ -616,7 +633,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             if (hasLower) strength++;
             if (hasNumber) strength++;
             if (hasSpecial) strength++;
-            
+
             // Update strength bar
             strengthBar.className = 'password-strength ';
             if (strength <= 1) strengthBar.classList.add('strength-weak');
@@ -630,7 +647,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             const password = document.getElementById('password').value;
             const confirmPassword = this.value;
             const help = document.getElementById('confirmPasswordHelp');
-            
+
             if (confirmPassword && password !== confirmPassword) {
                 help.textContent = "Passwords do not match";
             } else {

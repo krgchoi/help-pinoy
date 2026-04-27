@@ -69,18 +69,75 @@ def verify_admin_otp():
 
     if int(time.time()) > admin['otp_expiry']:
         return jsonify({'status': 'error', 'message': 'OTP expired'})
-
-    token = jwt.encode(
-        {'id': admin_id, 'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5)},
-        current_app.config['SECRET_KEY']
+    
+    access_token = jwt.encode(
+    {
+        'id': admin_id,
+        'type': 'access',
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)
+    },
+    current_app.config['SECRET_KEY']
+    )
+    
+    refresh_token = jwt.encode(
+    {
+        'id': admin_id,
+        'type': 'refresh',
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
+    },
+    current_app.config['SECRET_KEY']
     )
 
-    cursor.execute("UPDATE admin SET otp_code = NULL, otp_expiry = NULL WHERE id = %s", (admin_id,))
+    cursor.execute("UPDATE admin SET otp_code = NULL, otp_expiry = NULL, refresh_token = %s WHERE id = %s",(refresh_token, admin_id))
     conn.commit()
     cursor.close()
     conn.close()
 
-    return jsonify({'status': 'success', 'token': token, 'message': 'OTP verified successfully'})
+    return jsonify({
+    'status': 'success',
+    'access_token': access_token,
+    'refresh_token': refresh_token,
+    'message': 'OTP verified successfully'})
+
+@admin_auth_bp.route('/refresh', methods=['POST'])
+def refresh_token():
+    data = request.get_json()
+    token = data.get('refresh_token')
+
+    try:
+        decoded = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+
+        if decoded['type'] != 'refresh':
+            return jsonify({'status': 'error', 'message': 'Invalid token type'})
+
+        admin_id = decoded['id']
+
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT refresh_token FROM admin WHERE id = %s", (admin_id,))
+        admin = cursor.fetchone()
+
+        if not admin or admin['refresh_token'] != token:
+            return jsonify({'status': 'error', 'message': 'Invalid refresh token'})
+
+        new_access_token = jwt.encode(
+            {
+                'id': admin_id,
+                'type': 'access',
+                'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)
+            },
+            current_app.config['SECRET_KEY']
+        )
+
+        return jsonify({
+            'status': 'success',
+            'access_token': new_access_token
+        })
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({'status': 'error', 'message': 'Refresh token expired'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': 'Invalid token', 'error': str(e)})
 
 @admin_auth_bp.route('/resend_otp', methods=['POST'])
 def resend_admin_otp():
@@ -108,3 +165,4 @@ def resend_admin_otp():
     cursor.close()
     conn.close()
     return jsonify({'status': 'otp_resent', 'message': 'OTP resent to your email', 'otp_expiry': otp_expiry})
+

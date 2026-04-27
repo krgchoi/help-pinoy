@@ -88,9 +88,17 @@
     }
 
     @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
     }
 
     .thankyou-card h1 {
@@ -181,6 +189,7 @@
             transform: translateY(-100px) rotate(0deg);
             opacity: 1;
         }
+
         100% {
             transform: translateY(1000px) rotate(360deg);
             opacity: 0;
@@ -310,8 +319,15 @@
 
     /* Celebration animation */
     @keyframes celebrate {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
     }
 
     .celebrate {
@@ -336,16 +352,16 @@
             <div class="thankyou-icon">
                 <i class="bi bi-heart-fill"></i>
             </div>
-            
+
             <h1>Thank You for Your Generous Donation!</h1>
-            
+
             <p class="lead">
-                Your support means the world to us and will directly help provide relief and support 
+                Your support means the world to us and will directly help provide relief and support
                 to families affected by disasters across the Philippines.
             </p>
 
             <!-- Impact Statistics -->
-            <div class="impact-stats" data-aos="fade-up" data-aos-delay="600">
+            <!-- <div class="impact-stats" data-aos="fade-up" data-aos-delay="600">
                 <div class="stat-item">
                     <span class="stat-number">50+</span>
                     <span class="stat-label">Families Helped</span>
@@ -358,13 +374,13 @@
                     <span class="stat-number">100%</span>
                     <span class="stat-label">Direct Impact</span>
                 </div>
-            </div>
+            </div> -->
 
             <p class="text-muted mb-4">
                 You'll receive a confirmation email shortly with your donation receipt and tracking details.
             </p>
 
-            <a href="index.php" class="btn-return">
+            <a href="<?= BASE_URL ?>index.php" class="btn-return">
                 <i class="bi bi-house-fill"></i>
                 Return to Homepage
             </a>
@@ -374,7 +390,7 @@
         <div class="next-steps" data-aos="fade-up" data-aos-delay="900">
             <h3>Continue Making an Impact</h3>
             <p class="text-muted mb-4">Here are other ways you can help support our mission:</p>
-            
+
             <div class="steps-grid">
                 <div class="step-card">
                     <div class="step-icon">
@@ -383,7 +399,7 @@
                     <h4>Share Our Mission</h4>
                     <p>Spread the word about Help Pinoy on social media and encourage others to contribute.</p>
                 </div>
-                
+
                 <div class="step-card">
                     <div class="step-icon">
                         <i class="bi bi-clock-history"></i>
@@ -391,7 +407,7 @@
                     <h4>Set Up Monthly</h4>
                     <p>Consider making your donation recurring to provide sustained support for ongoing relief efforts.</p>
                 </div>
-                
+
                 <div class="step-card">
                     <div class="step-icon">
                         <i class="bi bi-newspaper"></i>
@@ -406,10 +422,10 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
-    AOS.init({ 
-        once: true, 
+    AOS.init({
+        once: true,
         duration: 1000,
-        offset: 100 
+        offset: 100
     });
 
     // Celebration effects
@@ -428,7 +444,7 @@
     function createConfetti() {
         const colors = ['#FFCC00', '#28a745', '#0057b7', '#dc3545', '#6f42c1'];
         const container = document.querySelector('.thankyou-card');
-        
+
         for (let i = 0; i < 50; i++) {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
@@ -443,13 +459,13 @@
 
     function animateNumbers() {
         const statNumbers = document.querySelectorAll('.stat-number');
-        
+
         statNumbers.forEach(stat => {
             const target = parseInt(stat.textContent);
             const duration = 2000;
             const step = target / (duration / 16);
             let current = 0;
-            
+
             const timer = setInterval(() => {
                 current += step;
                 if (current >= target) {

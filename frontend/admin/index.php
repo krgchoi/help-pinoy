@@ -1,25 +1,36 @@
 <?php
-include('./template/navbar.php');
+session_start();
 
-$jwt_token = $_SESSION['jwt_token'];
+if (!isset($_SESSION['access_token'])) {
+    header('Location: admin_login.php');
+    exit();
+}
 
+$jwt_token = $_SESSION['access_token'];
+
+// API CALL FIRST
 $url = "http://localhost:5000/admin/dashboard_data";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Content-Type: application/json',
-    "get-token: $jwt_token"
+    "Authorization: Bearer $jwt_token"
 ]);
 
 $response = curl_exec($ch);
 curl_close($ch);
 
 $data = json_decode($response, true);
-if ($data === null || isset($data['status']) && $data['status'] === 'expire') {
+
+// 🔥 Handle expired BEFORE output
+if ($data === null || (isset($data['status']) && $data['status'] === 'expire')) {
     session_destroy();
     header('Location: admin_login.php');
     exit();
 }
+
+// ✅ NOW include navbar AFTER logic
+include('./template/navbar.php');
 
 $sd = $data['sd'];
 $sd_month = $data['sd_month'];
@@ -44,16 +55,17 @@ $donationTrendsData = array_map(function ($month, $amount) {
 }, $donationMonths, $donationAmounts);
 
 // Payment method
-$paymentMethods = [];
-$paymentMethodCounts = [];
-foreach ($dm as $row) {
-    $paymentMethods[] = htmlspecialchars($row['payment_method'], ENT_QUOTES, 'UTF-8');
-    $paymentMethodCounts[] = (int)$row['total'];
-}
-$paymentMethodData = [];
-for ($i = 0; $i < count($paymentMethods); $i++) {
-    $paymentMethodData[] = [$paymentMethods[$i], $paymentMethodCounts[$i]];
-}
+// $paymentMethods = [];
+// $paymentMethodCounts = [];
+// foreach ($dm as $row) {
+//     $paymentMethods[] = htmlspecialchars($row['payment_method'], ENT_QUOTES, 'UTF-8');
+//     $paymentMethodCounts[] = (int)$row['total'];
+// }
+// $paymentMethodData = [];
+// for ($i = 0; $i < count($paymentMethods); $i++) {
+//     $paymentMethodData[] = [$paymentMethods[$i], $paymentMethodCounts[$i]];
+// }
+// 
 ?>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
@@ -130,10 +142,21 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     }
 
-    .stat-card.primary { border-top: 4px solid var(--primary-blue); }
-    .stat-card.success { border-top: 4px solid var(--success-green); }
-    .stat-card.warning { border-top: 4px solid var(--warning-orange); }
-    .stat-card.info { border-top: 4px solid var(--info-teal); }
+    .stat-card.primary {
+        border-top: 4px solid var(--primary-blue);
+    }
+
+    .stat-card.success {
+        border-top: 4px solid var(--success-green);
+    }
+
+    .stat-card.warning {
+        border-top: 4px solid var(--warning-orange);
+    }
+
+    .stat-card.info {
+        border-top: 4px solid var(--info-teal);
+    }
 
     .stat-icon {
         width: 70px;
@@ -147,10 +170,21 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
         color: white;
     }
 
-    .stat-card.primary .stat-icon { background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); }
-    .stat-card.success .stat-icon { background: linear-gradient(135deg, var(--success-green), #20c997); }
-    .stat-card.warning .stat-icon { background: linear-gradient(135deg, var(--warning-orange), #fd9843); }
-    .stat-card.info .stat-icon { background: linear-gradient(135deg, var(--info-teal), #39c0ed); }
+    .stat-card.primary .stat-icon {
+        background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    }
+
+    .stat-card.success .stat-icon {
+        background: linear-gradient(135deg, var(--success-green), #20c997);
+    }
+
+    .stat-card.warning .stat-icon {
+        background: linear-gradient(135deg, var(--warning-orange), #fd9843);
+    }
+
+    .stat-card.info .stat-icon {
+        background: linear-gradient(135deg, var(--info-teal), #39c0ed);
+    }
 
     .stat-content h3 {
         font-size: 0.9rem;
@@ -177,8 +211,13 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
         gap: 5px;
     }
 
-    .stat-change.positive { color: var(--success-green); }
-    .stat-change.negative { color: #dc3545; }
+    .stat-change.positive {
+        color: var(--success-green);
+    }
+
+    .stat-change.negative {
+        color: #dc3545;
+    }
 
     .charts-grid {
         display: grid;
@@ -289,16 +328,24 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
         letter-spacing: 0.5px;
     }
 
-    .bg-success { background: linear-gradient(135deg, var(--success-green), #20c997) !important; }
-    .bg-warning { background: linear-gradient(135deg, var(--warning-orange), #fd9843) !important; }
-    .bg-secondary { background: linear-gradient(135deg, #6c757d, #868e96) !important; }
+    .bg-success {
+        background: linear-gradient(135deg, var(--success-green), #20c997) !important;
+    }
+
+    .bg-warning {
+        background: linear-gradient(135deg, var(--warning-orange), #fd9843) !important;
+    }
+
+    .bg-secondary {
+        background: linear-gradient(135deg, #6c757d, #868e96) !important;
+    }
 
     /* Responsive Design */
     @media (max-width: 1200px) {
         .charts-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .tables-grid {
             grid-template-columns: 1fr;
         }
@@ -353,13 +400,18 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
         animation: loading 1.5s infinite;
     }
 
     @keyframes loading {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
     }
 </style>
 
@@ -495,8 +547,8 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
                                         <strong class="text-primary">₱<?php echo number_format($row['amount'], 2, '.', ','); ?></strong>
                                     </td>
                                     <td>
-                                        <span class="badge bg-<?php echo $row['payment_status'] === 'PAID' ? 'success' : ($row['payment_status'] === 'PENDING' ? 'warning' : 'secondary'); ?>">
-                                            <?php echo htmlspecialchars($row['payment_status']); ?>
+                                        <span class="badge bg-<?php echo $row['donation_status'] === 'APPROVED' ? 'success' : ($row['donation_status'] === 'PENDING' ? 'warning' : 'secondary'); ?>">
+                                            <?php echo htmlspecialchars($row['donation_status']); ?>
                                         </span>
                                     </td>
                                 </tr>
@@ -548,7 +600,9 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
 <!-- Google Charts -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-    google.charts.load('current', { packages: ['corechart'] });
+    google.charts.load('current', {
+        packages: ['corechart']
+    });
     google.charts.setOnLoadCallback(drawAllCharts);
 
     function drawAllCharts() {
@@ -564,20 +618,31 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
 
         var options = {
             title: '',
-            legend: { position: 'none' },
-            hAxis: { 
-                title: 'Month',
-                textStyle: { color: '#6c757d' }
+            legend: {
+                position: 'none'
             },
-            vAxis: { 
+            hAxis: {
+                title: 'Month',
+                textStyle: {
+                    color: '#6c757d'
+                }
+            },
+            vAxis: {
                 title: 'Amount (₱)',
-                textStyle: { color: '#6c757d' },
+                textStyle: {
+                    color: '#6c757d'
+                },
                 format: '₱#,##0'
             },
             backgroundColor: 'transparent',
             colors: ['#0057b7'],
-            chartArea: { width: '85%', height: '75%' },
-            bar: { groupWidth: '70%' },
+            chartArea: {
+                width: '85%',
+                height: '75%'
+            },
+            bar: {
+                groupWidth: '70%'
+            },
             animation: {
                 startup: true,
                 duration: 1000,
@@ -597,21 +662,28 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
 
         var options = {
             title: '',
-            legend: { 
+            legend: {
                 position: 'labeled',
-                textStyle: { color: '#6c757d' }
+                textStyle: {
+                    color: '#6c757d'
+                }
             },
             pieHole: 0.4,
             backgroundColor: 'transparent',
             colors: ['#0057b7', '#FFCC00', '#28a745', '#fd7e14'],
-            chartArea: { width: '90%', height: '80%' },
+            chartArea: {
+                width: '90%',
+                height: '80%'
+            },
             animation: {
                 startup: true,
                 duration: 1000,
                 easing: 'out'
             },
             pieSliceText: 'value',
-            tooltip: { text: 'percentage' }
+            tooltip: {
+                text: 'percentage'
+            }
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('payment_chart'));

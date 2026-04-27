@@ -1,3 +1,8 @@
+<?php
+define('BASE_URL', '/');
+define('API_BASE', 'https://api.helppinoy.org');
+?>
+
 <style>
     body {
         margin: 0;
@@ -77,7 +82,7 @@
 
     .navbar-brand img {
         height: 60px;
-        filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
+        filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
     }
 
     .nav-link {
@@ -121,32 +126,34 @@
     <div class="top-bar">
         <?php if (isset($_SESSION['username'])): ?>
             <div class="dropdown">
-                <a href="#" class="dropdown-toggle btn btn-login" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <a href="#" class="dropdown-toggle btn btn-login" id="userDropdown" data-bs-toggle="dropdown">
                     <?php echo htmlspecialchars($_SESSION['username']); ?>
                 </a>
-                <a href="donation_form.php" class="btn btn-donate">DONATE NOW</a>
+
+                <a href="<?= BASE_URL ?>donation_form.php" class="btn btn-donate">DONATE NOW</a>
 
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="user_prof.php">Profile</a></li>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>user_prof.php">Profile</a></li>
                     <li>
-                        <form action="user_logout.php" method="post">
+                        <form action="<?= BASE_URL ?>user_logout.php" method="post">
                             <button type="submit" class="dropdown-item">Logout</button>
                         </form>
                     </li>
                 </ul>
             </div>
         <?php else: ?>
-            <a href="user_login.php" class="btn btn-login">LOGIN</a>
-            <a href="register.php" class="btn btn-register">REGISTER</a>
-            <a href="donation_form.php" class="btn btn-donate">DONATE NOW</a>
+            <a href="<?= BASE_URL ?>user_login.php" class="btn btn-login">LOGIN</a>
+            <a href="<?= BASE_URL ?>register.php" class="btn btn-register">REGISTER</a>
+            <a href="<?= BASE_URL ?>donation_form.php" class="btn btn-donate">DONATE NOW</a>
         <?php endif; ?>
     </div>
 
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg main-navbar">
         <div class="container-fluid">
-            <a class="navbar-brand" href="index.php">
-                <img src="/Help_Pinoy/frontend/assets/img/hp_logo.png" alt="Help Pinoy Logo">
+
+            <a class="navbar-brand" href="<?= BASE_URL ?>">
+                <img src="<?= BASE_URL ?>assets/img/HP_logo12.png" alt="Help Pinoy Logo">
             </a>
 
             <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -155,26 +162,32 @@
 
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
-                    
+
                     <!-- ABOUT DROPDOWN -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle <?php if (basename($_SERVER['PHP_SELF']) == 'about.php') echo 'active'; ?>" 
-                           href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle <?= basename($_SERVER['PHP_SELF']) === 'about.php' ? 'active' : '' ?>"
+                            href="#" data-bs-toggle="dropdown">
                             ABOUT
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="about.php">WHO WE ARE</a></li>
-                            <li><a class="dropdown-item" href="centers.php">WHERE WE ARE</a></li>
-                            <li><a class="dropdown-item" href="about.php#mission">MISSION</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>about.php">WHO WE ARE</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>centers.php">WHERE WE ARE</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>about.php#mission">MISSION</a></li>
                         </ul>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link <?php if (basename($_SERVER['PHP_SELF']) == 'news.php') echo 'active'; ?>" href="news.php">STORIES</a>
+                        <a class="nav-link <?= basename($_SERVER['PHP_SELF']) === 'news.php' ? 'active' : '' ?>"
+                            href="<?= BASE_URL ?>news.php">
+                            STORIES
+                        </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link <?php if (basename($_SERVER['PHP_SELF']) == 'contact.php') echo 'active'; ?>" href="contact.php">CONTACT</a>
+                        <a class="nav-link <?= basename($_SERVER['PHP_SELF']) === 'contact.php' ? 'active' : '' ?>"
+                            href="<?= BASE_URL ?>contact.php">
+                            CONTACT
+                        </a>
                     </li>
 
                 </ul>
@@ -184,7 +197,7 @@
 </div>
 
 <script>
-    window.addEventListener('scroll', function () {
+    window.addEventListener('scroll', function() {
         const navbar = document.querySelector('.main-navbar');
         navbar.classList.toggle('navbar-scrolled', window.scrollY > 50);
     });

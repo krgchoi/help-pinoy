@@ -11,8 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Content-Type: application/json",
-        "get-token: $jwt_token"
+        'Content-Type: application/json',
+        "Authorization: Bearer $jwt_token"
     ]);
     $response = curl_exec($ch);
     curl_close($ch);
@@ -40,8 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_user'])) {
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Content-Type: application/json",
-        "get-token: $jwt_token"
+        'Content-Type: application/json',
+        "Authorization: Bearer $jwt_token"
     ]);
     $response = curl_exec($ch);
     curl_close($ch);
@@ -69,8 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Content-Type: application/json",
-        "get-token: $jwt_token"
+        'Content-Type: application/json',
+        "Authorization: Bearer $jwt_token"
     ]);
     $response = curl_exec($ch);
     curl_close($ch);
@@ -85,7 +85,8 @@ $url = "http://localhost:5000/admin/get_users";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "get-token: $jwt_token"
+    'Content-Type: application/json',
+    "Authorization: Bearer $jwt_token"
 ]);
 $response = curl_exec($ch);
 curl_close($ch);
@@ -101,6 +102,7 @@ if (isset($data['status']) && $data['status'] === 'expire') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -277,14 +279,16 @@ if (isset($data['status']) && $data['status'] === 'expire') {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border-radius: 8px;
             border: 2px solid #e9ecef;
             padding: 10px 15px;
             transition: var(--transition);
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
         }
@@ -333,7 +337,8 @@ if (isset($data['status']) && $data['status'] === 'expire') {
             font-weight: 500;
         }
 
-        .filter-btn:hover, .filter-btn.active {
+        .filter-btn:hover,
+        .filter-btn.active {
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
@@ -356,11 +361,11 @@ if (isset($data['status']) && $data['status'] === 'expire') {
             .stats-card .card-value {
                 font-size: 1.5rem;
             }
-            
+
             .table thead {
                 display: none;
             }
-            
+
             .table tbody tr {
                 display: block;
                 margin-bottom: 1rem;
@@ -368,26 +373,26 @@ if (isset($data['status']) && $data['status'] === 'expire') {
                 border-radius: var(--border-radius);
                 padding: 1rem;
             }
-            
+
             .table tbody td {
                 display: block;
                 text-align: right;
                 padding: 0.5rem 0;
                 border: none;
             }
-            
+
             .table tbody td::before {
                 content: attr(data-label);
                 float: left;
                 font-weight: 600;
                 color: var(--dark-color);
             }
-            
+
             .user-info {
                 display: flex;
                 align-items: center;
             }
-            
+
             .user-avatar {
                 margin-right: 0;
                 margin-bottom: 8px;
@@ -395,6 +400,7 @@ if (isset($data['status']) && $data['status'] === 'expire') {
         }
     </style>
 </head>
+
 <body>
     <!-- Dashboard Header -->
     <div class="dashboard-header">
@@ -425,48 +431,48 @@ if (isset($data['status']) && $data['status'] === 'expire') {
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="card-value"><?php
-                        $adminCount = 0;
-                        if (!empty($data)) {
-                            foreach ($data as $user) {
-                                if ($user['role'] === 'Admin') {
-                                    $adminCount++;
-                                }
-                            }
-                        }
-                        echo $adminCount;
-                    ?></div>
+                                            $adminCount = 0;
+                                            if (!empty($data)) {
+                                                foreach ($data as $user) {
+                                                    if ($user['role'] === 'Admin') {
+                                                        $adminCount++;
+                                                    }
+                                                }
+                                            }
+                                            echo $adminCount;
+                                            ?></div>
                     <div class="card-label">Administrators</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="card-value"><?php
-                        $userCount = 0;
-                        if (!empty($data)) {
-                            foreach ($data as $user) {
-                                if ($user['role'] === 'User') {
-                                    $userCount++;
-                                }
-                            }
-                        }
-                        echo $userCount;
-                    ?></div>
+                                            $userCount = 0;
+                                            if (!empty($data)) {
+                                                foreach ($data as $user) {
+                                                    if ($user['role'] === 'User') {
+                                                        $userCount++;
+                                                    }
+                                                }
+                                            }
+                                            echo $userCount;
+                                            ?></div>
                     <div class="card-label">Regular Users</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="card-value"><?php
-                        $donorCount = 0;
-                        if (!empty($data)) {
-                            foreach ($data as $user) {
-                                if ($user['role'] === 'Donor') {
-                                    $donorCount++;
-                                }
-                            }
-                        }
-                        echo $donorCount;
-                    ?></div>
+                                            $donorCount = 0;
+                                            if (!empty($data)) {
+                                                foreach ($data as $user) {
+                                                    if ($user['role'] === 'Donor') {
+                                                        $donorCount++;
+                                                    }
+                                                }
+                                            }
+                                            echo $donorCount;
+                                            ?></div>
                     <div class="card-label">Donors</div>
                 </div>
             </div>
@@ -521,26 +527,24 @@ if (isset($data['status']) && $data['status'] === 'expire') {
                                 </td>
                                 <td data-label="Role">
                                     <span class="badge-role bg-<?php
-                                        echo $user['role'] === 'Admin' ? 'danger' :
-                                            ($user['role'] === 'User' ? 'primary' : 'success');
-                                    ?>">
+                                                                echo $user['role'] === 'Admin' ? 'danger' : ($user['role'] === 'User' ? 'primary' : 'success');
+                                                                ?>">
                                         <i class="bi bi-<?php
-                                            echo $user['role'] === 'Admin' ? 'shield-check' :
-                                                ($user['role'] === 'User' ? 'person' : 'heart');
-                                        ?> me-1"></i>
+                                                        echo $user['role'] === 'Admin' ? 'shield-check' : ($user['role'] === 'User' ? 'person' : 'heart');
+                                                        ?> me-1"></i>
                                         <?php echo htmlspecialchars($user['role']); ?>
                                     </span>
                                 </td>
                                 <td data-label="Actions">
                                     <button class="btn btn-action btn-edit me-2" data-bs-toggle="modal"
-                                            data-bs-target="#editUser<?php echo $user['id']; ?>" title="Edit User">
+                                        data-bs-target="#editUser<?php echo $user['id']; ?>" title="Edit User">
                                         <i class="bi bi-pencil me-1"></i> Edit
                                     </button>
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user['id']); ?>">
-                                        <button type="submit" name="delete_user" class="btn btn-action btn-delete" 
-                                                onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.')" 
-                                                title="Delete User">
+                                        <button type="submit" name="delete_user" class="btn btn-action btn-delete"
+                                            onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.')"
+                                            title="Delete User">
                                             <i class="bi bi-trash me-1"></i> Delete
                                         </button>
                                     </form>
@@ -563,14 +567,14 @@ if (isset($data['status']) && $data['status'] === 'expire') {
                     <?php endif; ?>
                 </tbody>
             </table>
-            
+
             <!-- Pagination -->
             <?php if (!empty($data)): ?>
-            <div class="p-3 border-top">
-                <nav>
-                    <ul class="pagination justify-content-center mb-0" id="userTablePagination"></ul>
-                </nav>
-            </div>
+                <div class="p-3 border-top">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0" id="userTablePagination"></ul>
+                    </nav>
+                </div>
             <?php endif; ?>
         </div>
     </div>
@@ -662,20 +666,20 @@ if (isset($data['status']) && $data['status'] === 'expire') {
         searchInput.addEventListener('keyup', function() {
             const filter = searchInput.value.toLowerCase();
             const rows = document.querySelectorAll('#userTable tbody tr');
-            
+
             let visibleCount = 0;
-            
+
             rows.forEach(row => {
                 const name = row.children[0].textContent.toLowerCase();
                 const email = row.children[1].textContent.toLowerCase();
                 const role = row.children[2].textContent.toLowerCase();
-                
+
                 const isVisible = name.includes(filter) || email.includes(filter) || role.includes(filter);
                 row.style.display = isVisible ? '' : 'none';
-                
+
                 if (isVisible) visibleCount++;
             });
-            
+
             // Update pagination after filtering
             if (visibleCount > 0) {
                 paginateTable('userTable', 'userTablePagination', 10);
@@ -688,10 +692,10 @@ if (isset($data['status']) && $data['status'] === 'expire') {
                 // Update active state
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                
+
                 const filter = this.getAttribute('data-filter');
                 const rows = document.querySelectorAll('#userTable tbody tr');
-                
+
                 rows.forEach(row => {
                     if (filter === 'all') {
                         row.style.display = '';
@@ -700,7 +704,7 @@ if (isset($data['status']) && $data['status'] === 'expire') {
                         row.style.display = role === filter ? '' : 'none';
                     }
                 });
-                
+
                 // Update pagination after filtering
                 paginateTable('userTable', 'userTablePagination', 10);
             });
@@ -722,18 +726,18 @@ if (isset($data['status']) && $data['status'] === 'expire') {
             const tbody = table.querySelector('tbody');
             const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.style.display !== 'none');
             const pagination = document.getElementById(paginationId);
-            
+
             if (rows.length === 0) return;
 
             function showPage(page) {
                 const start = (page - 1) * rowsPerPage;
                 const end = start + rowsPerPage;
-                
+
                 // Hide all rows first
                 document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
                     row.style.display = 'none';
                 });
-                
+
                 // Show only rows for current page
                 rows.forEach((row, i) => {
                     if (i >= start && i < end) {
@@ -745,9 +749,9 @@ if (isset($data['status']) && $data['status'] === 'expire') {
             function renderPagination() {
                 pagination.innerHTML = '';
                 const pageCount = Math.ceil(rows.length / rowsPerPage);
-                
+
                 if (pageCount <= 1) return;
-                
+
                 // Previous button
                 const prevLi = document.createElement('li');
                 prevLi.className = 'page-item';
@@ -764,7 +768,7 @@ if (isset($data['status']) && $data['status'] === 'expire') {
                 };
                 prevLi.appendChild(prevA);
                 pagination.appendChild(prevLi);
-                
+
                 // Page numbers
                 for (let i = 1; i <= pageCount; i++) {
                     const li = document.createElement('li');
@@ -782,7 +786,7 @@ if (isset($data['status']) && $data['status'] === 'expire') {
                     li.appendChild(a);
                     pagination.appendChild(li);
                 }
-                
+
                 // Next button
                 const nextLi = document.createElement('li');
                 nextLi.className = 'page-item';
@@ -799,7 +803,7 @@ if (isset($data['status']) && $data['status'] === 'expire') {
                 };
                 nextLi.appendChild(nextA);
                 pagination.appendChild(nextLi);
-                
+
                 if (pagination.children.length > 0) pagination.children[1].classList.add('active');
             }
 
@@ -815,4 +819,5 @@ if (isset($data['status']) && $data['status'] === 'expire') {
 
     <?php include('./template/foot.php'); ?>
 </body>
+
 </html>

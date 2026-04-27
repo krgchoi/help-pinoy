@@ -8,8 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($email && $password) {
         if (isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
             $recaptcha = $_POST['g-recaptcha-response'];
-            $secretKey = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Test key
-            // $secretKey = '6LcWT_gqAAAAABhxRTWdczeUyI1SsLKSn48aACYx'; // Production key
+            $secretKey = '6LcWT_gqAAAAABhxRTWdczeUyI1SsLKSn48aACYx'; // Production key
+            // $secretKey = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Test key
 
             $verify = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secretKey . '&response=' . $recaptcha);
             $captchaResponse = json_decode($verify);
@@ -91,8 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .login-left {
@@ -200,8 +207,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .login-right {
-            background: linear-gradient(135deg, rgba(0, 51, 102, 0.9) 0%, rgba(0, 87, 183, 0.9) 100%), 
-                        url('../assets/img/login-bg.jpg') no-repeat center center;
+            background: linear-gradient(135deg, rgba(0, 51, 102, 0.9) 0%, rgba(0, 87, 183, 0.9) 100%),
+                url('../assets/img/login-bg.jpg') no-repeat center center;
             background-size: cover;
             position: relative;
             display: flex;
@@ -295,15 +302,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .login-wrapper {
                 border-radius: 15px;
             }
-            
+
             .login-left {
                 padding: 30px 25px;
             }
-            
+
             .login-right {
                 display: none;
             }
-            
+
             .brand-link {
                 font-size: 1.8rem;
             }
@@ -313,11 +320,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             body {
                 padding: 10px;
             }
-            
+
             .login-left {
                 padding: 25px 20px;
             }
-            
+
             .form-header h2 {
                 font-size: 1.5rem;
             }
@@ -345,7 +352,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -376,22 +385,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" action="" id="loginForm">
                 <div class="form-floating">
-                    <input type="email" class="form-control" id="email" name="email" 
-                           placeholder="name@example.com" required>
+                    <input type="email" class="form-control" id="email" name="email"
+                        placeholder="name@example.com" required>
                     <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
                 </div>
 
                 <div class="form-floating position-relative">
-                    <input type="password" class="form-control" id="password" name="password" 
-                           placeholder="Password" required>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Password" required>
                     <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
                     <button type="button" class="password-toggle" id="togglePassword">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
 
-                <!-- reCAPTCHA -->
-                <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+                <div class="recaptcha-container">
+                    <div class="g-recaptcha" data-sitekey="6LcWT_gqAAAAAF4T9KnGlPJ0aolNshRpCBfAlfXS" data-callback="enableLoginBtn"></div>
+                </div>
 
                 <button type="submit" class="btn btn-login" id="loginButton">
                     <span id="buttonText">Login to Account</span>
@@ -399,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
 
             <div class="register-link">
-                <p>Don't have an account? 
+                <p>Don't have an account?
                     <a href="register.php">Create an account here</a>
                 </p>
             </div>
@@ -410,7 +420,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="login-right-content">
                 <h3>Make an Impact</h3>
                 <p>Join thousands of Filipinos making a difference in their communities</p>
-                
+
                 <div class="features-list">
                     <div class="feature-item">
                         <div class="feature-icon">
@@ -450,7 +460,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const icon = this.querySelector('i');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 icon.classList.remove('fa-eye');
@@ -466,7 +476,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('loginForm').addEventListener('submit', function() {
             const button = document.getElementById('loginButton');
             const buttonText = document.getElementById('buttonText');
-            
+
             button.classList.add('btn-loading');
             buttonText.textContent = 'Signing in...';
             button.disabled = true;
@@ -478,7 +488,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             input.addEventListener('focus', function() {
                 this.parentElement.classList.add('focused');
             });
-            
+
             input.addEventListener('blur', function() {
                 if (this.value === '') {
                     this.parentElement.classList.remove('focused');

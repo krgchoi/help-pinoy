@@ -10,11 +10,20 @@ if (isset($_SESSION['otp_expiry'])) {
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['otp'])) {
+
+    if (!isset($_SESSION['admin_id'])) {
+        die("Session expired. Please login again.");
+    }
+
     $otp = filter_input(INPUT_POST, 'otp', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $admin_id = $_SESSION['admin_id'];
 
     $api_url = 'http://localhost:5000/admin/verify_otp';
-    $data = json_encode(['admin_id' => $admin_id, 'otp' => $otp]);
+
+    $data = json_encode([
+        'admin_id' => $admin_id,
+        'otp' => $otp
+    ]);
 
     $ch = curl_init($api_url);
     curl_setopt_array($ch, [
@@ -25,24 +34,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['otp'])) {
     ]);
 
     $response = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     $result = json_decode($response, true);
 
-    if ($result['status'] == 'success') {
-        $_SESSION['jwt_token'] = $result['token'];
+    if (!$result) {
+        $message = "Server error. Invalid response.";
+    } else if (isset($result['status']) && $result['status'] == 'success') {
+
+        $_SESSION['access_token'] = $result['access_token'];
+        $_SESSION['refresh_token'] = $result['refresh_token'];
         unset($_SESSION['otp_expiry']);
-        header('Location: dashboard.php');
+
+        header('Location: index.php');
         exit();
     } else {
-        $message = $result['message'];
-        if ($result['message'] === 'OTP expired') {
-            $otp_expiry = null;
+        $message = $result['message'] ?? 'OTP verification failed';
+
+        if ($message === 'OTP expired') {
             unset($_SESSION['otp_expiry']);
+            $otp_expiry = null;
         }
     }
 }
-
 // Handle AJAX resend OTP
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
     $admin_id = $_SESSION['admin_id'];
@@ -73,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -317,15 +333,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
             .otp-body {
                 padding: 20px;
             }
-            
+
             .otp-header {
                 padding: 20px 15px;
             }
-            
+
             .otp-header h2 {
                 font-size: 1.5rem;
             }
-            
+
             .otp-input {
                 width: 45px;
                 height: 55px;
@@ -334,6 +350,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
         }
     </style>
 </head>
+
 <body>
     <div class="otp-container">
         <div class="otp-card">
@@ -344,7 +361,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
                 <h2>Help Pinoy</h2>
                 <p>Admin OTP Verification</p>
             </div>
-            
+
             <div class="otp-body">
                 <?php if (!empty($message)) : ?>
                     <div class="alert alert-danger" role="alert">
@@ -364,7 +381,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
                         <input type="text" class="otp-input" maxlength="1" data-index="5" autocomplete="off">
                         <input type="text" class="otp-input" maxlength="1" data-index="6" autocomplete="off">
                     </div>
-                    
+
                     <input type="hidden" id="otp" name="otp" value="">
 
                     <button type="submit" class="verify-btn" id="verifyBtn" disabled>
@@ -410,7 +427,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
         function startCountdown() {
             const resendBtn = document.getElementById('resendBtn');
             const timerElem = document.getElementById('timer');
-            
+
             if (timerInterval) clearInterval(timerInterval);
 
             if (!otpExpiresIn || otpExpiresIn <= 0) {
@@ -419,21 +436,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
                 timerElem.className = 'timer-expired';
                 return;
             }
-            
+
             resendBtn.disabled = true;
             timerInterval = setInterval(function() {
                 let minutes = Math.floor(otpExpiresIn / 60);
                 let seconds = otpExpiresIn % 60;
-                
+
                 // Add visual warning when time is running low
                 if (otpExpiresIn <= 60) {
                     timerElem.className = 'timer-warning';
                 } else {
                     timerElem.className = '';
                 }
-                
+
                 timerElem.textContent = `OTP expires in ${minutes}:${seconds.toString().padStart(2, '0')}`;
-                
+
                 if (otpExpiresIn <= 0) {
                     clearInterval(timerInterval);
                     resendBtn.disabled = false;
@@ -448,11 +465,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
         function resendOtp() {
             const resendBtn = document.getElementById('resendBtn');
             const timerElem = document.getElementById('timer');
-            
+
             resendBtn.disabled = true;
             resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resending...';
             timerElem.textContent = 'Resending OTP...';
-            
+
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -464,7 +481,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
                         startCountdown();
                         timerElem.textContent = 'OTP resent! Please check your email.';
                         timerElem.className = '';
-                        
+
                         // Reset OTP inputs
                         document.querySelectorAll('.otp-input').forEach(input => {
                             input.value = '';
@@ -472,7 +489,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
                         });
                         document.getElementById('otp').value = '';
                         document.getElementById('verifyBtn').disabled = true;
-                        
+
                         setTimeout(() => {
                             startCountdown();
                         }, 2000);
@@ -486,7 +503,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
                     timerElem.className = 'timer-expired';
                     resendBtn.disabled = false;
                 }
-                
+
                 resendBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Resend OTP';
             };
             xhr.send('resend_otp=1');
@@ -497,21 +514,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
             input.addEventListener('input', function() {
                 const value = this.value;
                 const index = parseInt(this.getAttribute('data-index'));
-                
+
                 // Only allow numbers
                 if (!/^\d*$/.test(value)) {
                     this.value = '';
                     return;
                 }
-                
+
                 // Move to next input if current is filled
                 if (value.length === 1 && index < 6) {
                     document.querySelector(`.otp-input[data-index="${index + 1}"]`).focus();
                 }
-                
+
                 // Update hidden field with complete OTP
                 updateOTPValue();
-                
+
                 // Update UI for filled inputs
                 if (value.length === 1) {
                     this.classList.add('filled');
@@ -519,7 +536,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
                     this.classList.remove('filled');
                 }
             });
-            
+
             // Handle backspace
             input.addEventListener('keydown', function(e) {
                 if (e.key === 'Backspace' && this.value === '' && parseInt(this.getAttribute('data-index')) > 1) {
@@ -534,9 +551,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
             document.querySelectorAll('.otp-input').forEach(input => {
                 otpValue += input.value;
             });
-            
+
             document.getElementById('otp').value = otpValue;
-            
+
             // Enable verify button if OTP is complete
             document.getElementById('verifyBtn').disabled = otpValue.length !== 6;
         }
@@ -544,12 +561,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
         // Form submission handling
         document.getElementById('otpForm').addEventListener('submit', function(e) {
             const otpValue = document.getElementById('otp').value;
-            
+
             if (otpValue.length !== 6) {
                 e.preventDefault();
                 return false;
             }
-            
+
             // Show loading state
             const verifyBtn = document.getElementById('verifyBtn');
             verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
@@ -559,10 +576,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
         // Initialize on page load
         window.onload = function() {
             startCountdown();
-            
+
             // Auto-focus first OTP input
             document.querySelector('.otp-input[data-index="1"]').focus();
         };
     </script>
 </body>
+
 </html>
