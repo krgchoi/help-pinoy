@@ -52,6 +52,15 @@ $dt = $data['dt'] ?? [];
 $rd = $data['rd'] ?? [];
 $tp = $data['tp'] ?? [];
 $dtr = $data['dtr'] ?? [];
+$pending_total = $data['pending_total'] ?? 0;
+$remaining_funds = $data['remaining_funds'] ?? 0;
+$previous_month_total = $data['previous_month_total'] ?? 0;
+$new_users_month = $data['new_users_month'] ?? 0;
+$completion_rate = $data['completion_rate'] ?? 0;
+
+echo "<pre>";
+print_r($pending_total);
+echo "</pre>";
 
 // Donation trends
 $donationMonths = [];
@@ -75,6 +84,22 @@ $paymentMethodData = [];
 for ($i = 0; $i < count($paymentMethods); $i++) {
     $paymentMethodData[] = [$paymentMethods[$i], $paymentMethodCounts[$i]];
 }
+
+// Donation status distribution
+$statusLabels = [];
+$statusCounts = [];
+foreach ($dr as $row) {
+    $statusLabels[] = htmlspecialchars($row['donation_status'], ENT_QUOTES, 'UTF-8');
+    $statusCounts[] = (int)$row['count'];
+}
+$donationStatusData = [];
+for ($i = 0; $i < count($statusLabels); $i++) {
+    $donationStatusData[] = [$statusLabels[$i], $statusCounts[$i]];
+}
+
+// Month-over-month change
+$mom_change = $sd_month - $previous_month_total;
+$mom_percentage = $previous_month_total > 0 ? (($mom_change / $previous_month_total) * 100) : 0;
 ?>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
@@ -500,6 +525,76 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
                     </div>
                 </div>
             </div>
+
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Remaining Funds</h3>
+                    <div class="stat-value">₱<?php echo number_format($remaining_funds, 2, '.', ','); ?></div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-lock"></i>
+                        Unallocated balance
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card warning">
+                <div class="stat-icon">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Pending Donations</h3>
+                    <div class="stat-value"><?php echo number_format($pending_total); ?></div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-clock"></i>
+                        Awaiting verification
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card success">
+                <div class="stat-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>New Users</h3>
+                    <div class="stat-value"><?php echo number_format($new_users_month); ?></div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-chart-line"></i>
+                        This month
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card info">
+                <div class="stat-icon">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Completion Rate</h3>
+                    <div class="stat-value"><?php echo number_format($completion_rate, 1); ?>%</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-check-circle"></i>
+                        Approved donations
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card <?php echo $mom_change >= 0 ? 'success' : 'warning'; ?>">
+                <div class="stat-icon">
+                    <i class="fas fa-compare"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Month vs Month</h3>
+                    <div class="stat-value">₱<?php echo number_format($mom_change, 2, '.', ','); ?></div>
+                    <div class="stat-change <?php echo $mom_change >= 0 ? 'positive' : 'negative'; ?>">
+                        <i class="fas fa-arrow-<?php echo $mom_change >= 0 ? 'up' : 'down'; ?>"></i>
+                        <?php echo $mom_percentage > 0 ? '+' : ''; ?><?php echo number_format($mom_percentage, 1); ?>%
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Charts Section -->
@@ -519,6 +614,15 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
                 </div>
                 <div class="chart-container">
                     <div id="payment_chart" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-doughnut me-2"></i>Donation Status</h3>
+                </div>
+                <div class="chart-container">
+                    <div id="status_chart" style="width: 100%; height: 100%;"></div>
                 </div>
             </div>
         </div>
@@ -617,6 +721,7 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
     function drawAllCharts() {
         drawDonationTrends();
         drawPaymentMethodChart();
+        drawDonationStatusChart();
     }
 
     function drawDonationTrends() {
@@ -699,7 +804,41 @@ for ($i = 0; $i < count($paymentMethods); $i++) {
         chart.draw(data, options);
     }
 
-    window.addEventListener('resize', drawAllCharts);
+    function drawDonationStatusChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Status');
+        data.addColumn('number', 'Count');
+        data.addRows(<?php echo json_encode($donationStatusData); ?>);
+
+        var options = {
+            title: '',
+            legend: {
+                position: 'labeled',
+                textStyle: {
+                    color: '#6c757d'
+                }
+            },
+            pieHole: 0.4,
+            backgroundColor: 'transparent',
+            colors: ['#28a745', '#fd7e14', '#17a2b8', '#dc3545'],
+            chartArea: {
+                width: '90%',
+                height: '80%'
+            },
+            animation: {
+                startup: true,
+                duration: 1000,
+                easing: 'out'
+            },
+            pieSliceText: 'value',
+            tooltip: {
+                text: 'percentage'
+            }
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('status_chart'));
+        chart.draw(data, options);
+    }
 
     // Auto-refresh charts every 30 seconds
     setInterval(drawAllCharts, 30000);

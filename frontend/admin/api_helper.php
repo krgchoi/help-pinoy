@@ -36,7 +36,9 @@ function api_call($url, $jwt_token, $method = 'GET', $data = null)
         header('Location: admin_logout.php');
         exit();
     }
+
     $decoded = json_decode($response, true);
+
 
     if (is_array($decoded) && isset($decoded['status']) && ($decoded['status'] === 'error' || $decoded['status'] === 'expire')) {
         session_destroy();

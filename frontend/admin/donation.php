@@ -2,7 +2,12 @@
 include('./api_helper.php');
 include('./template/navbar.php');
 
-$jwt_token = $_SESSION['access_token'];
+$jwt_token = $_SESSION['access_token'] ?? null;
+
+if (!$jwt_token) {
+    header("Location: admin_login.php");
+    exit();
+}
 
 $data = api_call('http://localhost:5000/admin/donations', $jwt_token);
 
@@ -17,22 +22,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_status'])) {
     ]);
 
     if (isset($result['status']) && $result['status'] == 'success') {
-        echo "<script>alert('Donation status updated successfully!'); window.location.href = 'donation.php';</script>";
+        $_SESSION['toast_message'] = 'Donation status updated successfully!';
+        $_SESSION['toast_type'] = 'success';
+        echo "<script>window.location.href = 'donation.php';</script>";
         exit();
     } else {
-        echo "<script>alert('Failed updating donation status!');</script>";
+        $_SESSION['toast_message'] = $result['message'] ?? 'Failed updating donation status!';
+        $_SESSION['toast_type'] = 'error';
     }
 }
 
-$donations = $data;
+$donations = is_array($data) ? $data : [];
+
+// Calculate statistics
+$totalAmount = 0;
+$totalDonations = count($donations);
+$approvedCount = 0;
+$pendingCount = 0;
+$verifyingCount = 0;
+$rejectedCount = 0;
+
+foreach ($donations as $donation) {
+    if ($donation['donation_status'] === 'APPROVED') {
+        $totalAmount += $donation['amount'];
+        $approvedCount++;
+    } elseif ($donation['donation_status'] === 'PENDING') {
+        $pendingCount++;
+    } elseif ($donation['donation_status'] === 'VERIFYING') {
+        $verifyingCount++;
+    } elseif ($donation['donation_status'] === 'REJECTED') {
+        $rejectedCount++;
+    }
+}
 ?>
 
-<title>Donations Management | Help Pinoy Admin</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<!-- Page specific CSS -->
 <style>
     :root {
-        --primary-color: #4361ee;
-        --secondary-color: #3a0ca3;
+        --primary-color: #0057b7;
+        --secondary-color: #002855;
         --accent-color: #4cc9f0;
         --success-color: #28a745;
         --warning-color: #ffc107;
@@ -45,7 +73,7 @@ $donations = $data;
     }
 
     .dashboard-header {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        background: linear-gradient(135deg, #0057b7, #002855);
         color: white;
         padding: 2rem 0;
         margin-bottom: 2rem;
@@ -59,7 +87,7 @@ $donations = $data;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
         transition: var(--transition);
-        border-left: 4px solid var(--primary-color);
+        border-left: 4px solid #0057b7;
     }
 
     .stats-card:hover {
@@ -70,7 +98,7 @@ $donations = $data;
     .stats-card .card-value {
         font-size: 2rem;
         font-weight: 700;
-        color: var(--primary-color);
+        color: #0057b7;
         margin-bottom: 0.5rem;
     }
 
@@ -102,19 +130,19 @@ $donations = $data;
     }
 
     #searchInput:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        border-color: #0057b7;
+        box-shadow: 0 0 0 0.2rem rgba(0, 87, 183, 0.25);
     }
 
     .table-container {
         background: white;
         border-radius: var(--border-radius);
         box-shadow: var(--box-shadow);
-        overflow: hidden;
+        overflow-x: auto;
     }
 
     .table thead {
-        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        background: linear-gradient(135deg, #0057b7, #002855);
         color: white;
     }
 
@@ -131,9 +159,7 @@ $donations = $data;
     }
 
     .table-hover tbody tr:hover {
-        background-color: rgba(67, 97, 238, 0.05);
-        transform: scale(1.01);
-        transition: var(--transition);
+        background-color: rgba(0, 87, 183, 0.05);
     }
 
     .badge-status {
@@ -143,23 +169,43 @@ $donations = $data;
         font-weight: 600;
     }
 
+    .bg-PENDING {
+        background: #6c757d;
+        color: white;
+    }
+
+    .bg-VERIFYING {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    .bg-APPROVED {
+        background: #28a745;
+        color: white;
+    }
+
+    .bg-REJECTED {
+        background: #dc3545;
+        color: white;
+    }
+
     .btn-view {
         background: transparent;
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
+        border: 1px solid #0057b7;
+        color: #0057b7;
         border-radius: 6px;
         padding: 6px 12px;
         transition: var(--transition);
     }
 
     .btn-view:hover {
-        background: var(--primary-color);
+        background: #0057b7;
         color: white;
         transform: translateY(-2px);
     }
 
     .modal-header {
-        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        background: linear-gradient(135deg, #0057b7, #002855);
         color: white;
     }
 
@@ -188,20 +234,21 @@ $donations = $data;
     }
 
     .pagination .page-link {
-        color: var(--primary-color);
+        color: #0057b7;
         border: 1px solid #dee2e6;
         margin: 0 2px;
         border-radius: 6px;
     }
 
     .pagination .page-item.active .page-link {
-        background: var(--primary-color);
-        border-color: var(--primary-color);
+        background: #0057b7;
+        border-color: #0057b7;
+        color: white;
     }
 
     .pagination .page-link:hover {
-        background: rgba(67, 97, 238, 0.1);
-        border-color: var(--primary-color);
+        background: rgba(0, 87, 183, 0.1);
+        border-color: #0057b7;
     }
 
     .empty-state {
@@ -218,6 +265,9 @@ $donations = $data;
 
     .filter-buttons {
         margin-bottom: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
     }
 
     .filter-btn {
@@ -225,17 +275,27 @@ $donations = $data;
         border: 1px solid #dee2e6;
         border-radius: 50px;
         padding: 8px 16px;
-        margin-right: 8px;
-        margin-bottom: 8px;
         transition: var(--transition);
         font-weight: 500;
     }
 
     .filter-btn:hover,
     .filter-btn.active {
-        background: var(--primary-color);
+        background: #0057b7;
         color: white;
-        border-color: var(--primary-color);
+        border-color: #0057b7;
+    }
+
+    .proof-image {
+        max-width: 100px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+    .proof-image:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
 
     @media (max-width: 768px) {
@@ -268,14 +328,16 @@ $donations = $data;
             font-weight: 600;
             color: var(--dark-color);
         }
+
+        .donation-detail strong {
+            width: 120px;
+        }
     }
 </style>
-</head>
-
 
 <!-- Dashboard Header -->
 <div class="dashboard-header">
-    <div class="container">
+    <div class="container-fluid px-4">
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="h2 mb-2"><i class="bi bi-gift-fill me-2"></i>Donations Management</h1>
@@ -283,7 +345,7 @@ $donations = $data;
             </div>
             <div class="col-md-4 text-md-end">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-light">
+                    <button type="button" class="btn btn-light" onclick="exportToCSV()">
                         <i class="bi bi-download me-1"></i> Export
                     </button>
                 </div>
@@ -292,63 +354,30 @@ $donations = $data;
     </div>
 </div>
 
-<div class="container">
+<div class="container-fluid px-4">
     <!-- Stats Overview -->
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="stats-card">
-                <div class="card-value">₱ <?php
-                                            $totalAmount = 0;
-                                            if (!empty($donations)) {
-                                                foreach ($donations as $donation) {
-                                                    if ($donation['donation_status'] === 'APPROVED') {
-                                                        $totalAmount += $donation['amount'];
-                                                    }
-                                                }
-                                            }
-                                            echo number_format($totalAmount, 2);
-                                            ?></div>
+                <div class="card-value">₱ <?php echo number_format($totalAmount, 2); ?></div>
                 <div class="card-label">Total Donations</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stats-card">
-                <div class="card-value"><?php
-                                        $totalDonations = !empty($donations) ? count($donations) : 0;
-                                        echo $totalDonations;
-                                        ?></div>
+                <div class="card-value"><?php echo $totalDonations; ?></div>
                 <div class="card-label">Total Transactions</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stats-card">
-                <div class="card-value"><?php
-                                        $paidCount = 0;
-                                        if (!empty($donations)) {
-                                            foreach ($donations as $donation) {
-                                                if ($donation['donation_status'] === 'APPROVED') {
-                                                    $paidCount++;
-                                                }
-                                            }
-                                        }
-                                        echo $paidCount;
-                                        ?></div>
+                <div class="card-value"><?php echo $approvedCount; ?></div>
                 <div class="card-label">Successful Payments</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stats-card">
-                <div class="card-value"><?php
-                                        $pendingCount = 0;
-                                        if (!empty($donations)) {
-                                            foreach ($donations as $donation) {
-                                                if ($donation['donation_status'] === 'PENDING') {
-                                                    $pendingCount++;
-                                                }
-                                            }
-                                        }
-                                        echo $pendingCount;
-                                        ?></div>
+                <div class="card-value"><?php echo $pendingCount + $verifyingCount; ?></div>
                 <div class="card-label">Pending Payments</div>
             </div>
         </div>
@@ -391,13 +420,12 @@ $donations = $data;
                     <?php foreach ($donations as $donation): ?>
                         <?php
                         $status = $donation['donation_status'];
-
-                        $badge = match ($status) {
-                            'PENDING' => 'secondary',
-                            'VERIFYING' => 'warning text-dark',
-                            'APPROVED' => 'success',
-                            'REJECTED' => 'danger',
-                            default => 'secondary'
+                        $badgeClass = match ($status) {
+                            'PENDING' => 'bg-PENDING',
+                            'VERIFYING' => 'bg-VERIFYING',
+                            'APPROVED' => 'bg-APPROVED',
+                            'REJECTED' => 'bg-REJECTED',
+                            default => 'bg-secondary'
                         };
                         ?>
                         <tr data-status="<?php echo htmlspecialchars($status); ?>">
@@ -406,14 +434,14 @@ $donations = $data;
                                 <small class="text-muted"><?php echo htmlspecialchars($donation['donation_id']); ?></small>
                             </td>
                             <td data-label="Amount">
-                                <strong class="text-success">₱ <?php echo number_format($donation['amount'], 2, '.', ','); ?></strong>
+                                <strong class="text-success">₱ <?php echo number_format($donation['amount'], 2); ?></strong>
                             </td>
                             <td data-label="Donor Name">
                                 <div class="fw-medium"><?php echo htmlspecialchars($donation['full_name']); ?></div>
                                 <small class="text-muted"><?php echo htmlspecialchars($donation['email']); ?></small>
                             </td>
                             <td data-label="Status">
-                                <span class="badge-status bg-<?php echo $badge; ?>">
+                                <span class="badge-status <?php echo $badgeClass; ?>">
                                     <?php echo htmlspecialchars($status); ?>
                                 </span>
                             </td>
@@ -444,7 +472,7 @@ $donations = $data;
         </table>
 
         <!-- Pagination -->
-        <?php if (!empty($donations)): ?>
+        <?php if (!empty($donations) && count($donations) > 10): ?>
             <div class="p-3 border-top">
                 <nav>
                     <ul class="pagination justify-content-center mb-0" id="donationTablePagination"></ul>
@@ -459,22 +487,20 @@ $donations = $data;
     <?php foreach ($donations as $donation): ?>
         <?php
         $status = $donation['donation_status'];
-
-        $badge = match ($status) {
-            'PENDING' => 'secondary',
-            'VERIFYING' => 'warning text-dark',
-            'APPROVED' => 'success',
-            'REJECTED' => 'danger',
-            default => 'secondary'
+        $badgeClass = match ($status) {
+            'PENDING' => 'bg-PENDING',
+            'VERIFYING' => 'bg-VERIFYING',
+            'APPROVED' => 'bg-APPROVED',
+            'REJECTED' => 'bg-REJECTED',
+            default => 'bg-secondary'
         };
         ?>
 
         <div class="modal fade" id="donationModal<?php echo htmlspecialchars($donation['donation_id']); ?>" tabindex="-1">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
-
                     <form method="POST" action="">
-                        <input type="hidden" name="donation_id" value="<?php echo $donation['donation_id']; ?>">
+                        <input type="hidden" name="donation_id" value="<?php echo htmlspecialchars($donation['donation_id']); ?>">
 
                         <div class="modal-header">
                             <h5 class="modal-title">
@@ -485,7 +511,6 @@ $donations = $data;
 
                         <div class="modal-body">
                             <div class="row">
-
                                 <!-- LEFT SIDE -->
                                 <div class="col-md-6">
                                     <h6 class="mb-3 text-primary">Donor Information</h6>
@@ -493,6 +518,11 @@ $donations = $data;
                                     <div class="donation-detail">
                                         <strong>Donation ID:</strong>
                                         <?php echo htmlspecialchars($donation['donation_id']); ?>
+                                    </div>
+
+                                    <div class="donation-detail">
+                                        <strong>Public ID:</strong>
+                                        <?php echo htmlspecialchars($donation['public_id']); ?>
                                     </div>
 
                                     <div class="donation-detail">
@@ -507,12 +537,12 @@ $donations = $data;
 
                                     <div class="donation-detail">
                                         <strong>Contact:</strong>
-                                        <?php echo htmlspecialchars($donation['contact_number']); ?>
+                                        <?php echo htmlspecialchars($donation['contact_number'] ?? 'N/A'); ?>
                                     </div>
 
                                     <div class="donation-detail">
                                         <strong>Birthday:</strong>
-                                        <?php echo $donation['birthday']
+                                        <?php echo !empty($donation['birthday'])
                                             ? htmlspecialchars(date('F j, Y', strtotime($donation['birthday'])))
                                             : 'N/A'; ?>
                                     </div>
@@ -532,61 +562,47 @@ $donations = $data;
                                         <strong>Status:</strong>
 
                                         <?php if ($status === 'APPROVED' || $status === 'REJECTED'): ?>
-                                            <!-- LOCKED FINAL STATES -->
-                                            <span class="badge-status bg-<?php echo $badge; ?>">
+                                            <span class="badge-status <?php echo $badgeClass; ?>">
                                                 <?php echo htmlspecialchars($status); ?>
                                             </span>
                                             <small class="text-muted d-block mt-1">Status locked</small>
-
                                         <?php else: ?>
-                                            <!-- ONLY FINAL DECISION OPTIONS -->
-                                            <select name="donation_status" class="form-select form-select-sm mt-1">
-
-                                                <!-- default is current status -->
-                                                <option value="APPROVED" <?php echo ($status === 'APPROVED') ? 'selected' : ''; ?>>
-                                                    APPROVED
-                                                </option>
-
-                                                <option value="REJECTED" <?php echo ($status === 'REJECTED') ? 'selected' : ''; ?>>
-                                                    REJECTED
-                                                </option>
-
+                                            <select name="donation_status" class="form-select form-select-sm mt-1" style="max-width: 200px;">
+                                                <option value="APPROVED">APPROVED</option>
+                                                <option value="REJECTED">REJECTED</option>
                                             </select>
                                         <?php endif; ?>
                                     </div>
 
-                                    <!-- PROOF -->
+                                    <!-- PROOF IMAGE -->
                                     <div class="donation-detail">
                                         <strong>Proof Image:</strong>
                                         <?php if (!empty($donation['proof_image'])): ?>
-                                            <img src="assets/<?php echo htmlspecialchars($donation['proof_image']); ?>"
-                                                style="max-width:100px; cursor:pointer;"
-                                                onclick="openImage(this)">
+                                            <div class="mt-2">
+                                                <img src="assets/<?php echo htmlspecialchars($donation['proof_image']); ?>"
+                                                    class="proof-image"
+                                                    onclick="openImage(this.src)">
+                                            </div>
                                         <?php else: ?>
-                                            N/A
+                                            <span class="text-muted">N/A</span>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- RECEIPT -->
+                                    <div class="donation-detail">
+                                        <strong>Receipt:</strong>
+                                        <?php if (!empty($donation['receipt_reference'])): ?>
+                                            <a href="<?php echo htmlspecialchars($donation['receipt_reference']); ?>"
+                                                target="_blank" class="btn btn-outline-primary btn-sm mt-1">
+                                                <i class="bi bi-receipt me-1"></i> View Receipt
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-muted">N/A</span>
                                         <?php endif; ?>
                                     </div>
 
                                     <div class="donation-detail">
                                         <strong>Donation Date:</strong>
-                                        <?php echo date('F j, Y h:i A', strtotime($donation['donation_date'])); ?>
-                                    </div>
-
-                                    <div class="donation-detail">
-                                        <strong>Receipt:</strong>
-                                        <?php if ($donation['receipt_reference']): ?>
-                                            <a href="<?php echo htmlspecialchars($donation['receipt_reference']); ?>"
-                                                target="_blank"
-                                                class="btn btn-outline-primary btn-sm ms-2">
-                                                <i class="bi bi-receipt me-1"></i> View Receipt
-                                            </a>
-                                        <?php else: ?>
-                                            N/A
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <div class="donation-detail">
-                                        <strong>Date Donated:</strong>
                                         <?php echo date('F j, Y h:i A', strtotime($donation['donation_date'])); ?>
                                     </div>
                                 </div>
@@ -595,75 +611,109 @@ $donations = $data;
 
                         <!-- FOOTER -->
                         <div class="modal-footer">
-
                             <?php if ($status !== 'APPROVED' && $status !== 'REJECTED'): ?>
-                                <button type="submit"
-                                    name="update_status"
-                                    class="btn btn-primary">
-                                    Save
+                                <button type="submit" name="update_status" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-1"></i> Update Status
                                 </button>
                             <?php endif; ?>
-
-                            <button type="button"
-                                class="btn btn-secondary"
-                                data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 Close
                             </button>
                         </div>
-
                     </form>
-
                 </div>
             </div>
         </div>
-
     <?php endforeach; ?>
 <?php endif; ?>
 
+<!-- Image Viewer Modal -->
 <div class="modal fade" id="imageViewer" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
+            <div class="modal-header bg-dark">
+                <h5 class="modal-title text-white">Proof of Donation</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
             <div class="modal-body text-center p-0">
-                <img id="imageViewerSrc" class="img-fluid" />
+                <img id="imageViewerSrc" class="img-fluid" style="max-height: 80vh; width: auto;" />
             </div>
         </div>
     </div>
 </div>
+
 <script>
-    function openImage(img) {
-        const src = img.getAttribute('src');
+    // Open image viewer
+    function openImage(src) {
         document.getElementById('imageViewerSrc').setAttribute('src', src);
         new bootstrap.Modal(document.getElementById('imageViewer')).show();
     }
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('keyup', function() {
-        const filter = searchInput.value.toLowerCase();
-        const rows = document.querySelectorAll('#donationTable tbody tr');
 
-        let visibleCount = 0;
+    // Export to CSV function
+    function exportToCSV() {
+        const table = document.getElementById('donationTable');
+        const rows = table.querySelectorAll('tbody tr');
+        let csv = [];
 
+        // Get headers
+        const headers = ['Donation ID', 'Amount', 'Donor Name', 'Status', 'Date'];
+        csv.push(headers.join(','));
+
+        // Get data from visible rows
         rows.forEach(row => {
-            const donationId = row.children[0].textContent.toLowerCase();
-            const donorName = row.children[2].textContent.toLowerCase();
-            const email = row.querySelector('small.text-muted') ? row.querySelector('small.text-muted').textContent.toLowerCase() : '';
-
-            const isVisible = donationId.includes(filter) || donorName.includes(filter) || email.includes(filter);
-            row.style.display = isVisible ? '' : 'none';
-
-            if (isVisible) visibleCount++;
+            if (row.style.display !== 'none') {
+                const rowData = [];
+                const cells = row.querySelectorAll('td');
+                for (let i = 0; i < 5; i++) {
+                    let text = cells[i].textContent.trim();
+                    // Remove extra spaces and wrap in quotes if contains comma
+                    text = text.replace(/\s+/g, ' ');
+                    if (text.includes(',')) text = `"${text}"`;
+                    rowData.push(text);
+                }
+                csv.push(rowData.join(','));
+            }
         });
 
-        // Update pagination after filtering
-        if (visibleCount > 0) {
-            paginateTable('donationTable', 'donationTablePagination', 10);
-        }
-    });
+        // Download CSV
+        const blob = new Blob([csv.join('\n')], {
+            type: 'text/csv'
+        });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `donations_${new Date().toISOString().slice(0,19)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        showToast('Export completed successfully!', 'success');
+    }
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const filter = searchInput.value.toLowerCase();
+            const rows = document.querySelectorAll('#donationTable tbody tr');
+
+            rows.forEach(row => {
+                const donationId = row.querySelector('td[data-label="Donation ID"]')?.textContent.toLowerCase() || '';
+                const donorName = row.querySelector('td[data-label="Donor Name"]')?.textContent.toLowerCase() || '';
+                const isVisible = donationId.includes(filter) || donorName.includes(filter);
+                row.style.display = isVisible ? '' : 'none';
+            });
+
+            if (typeof paginateTable === 'function') {
+                paginateTable('donationTable', 'donationTablePagination', 10);
+            }
+        });
+    }
 
     // Filter functionality
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            // Update active state
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
 
@@ -679,34 +729,31 @@ $donations = $data;
                 }
             });
 
-            // Update pagination after filtering
-            paginateTable('donationTable', 'donationTablePagination', 10);
+            if (typeof paginateTable === 'function') {
+                paginateTable('donationTable', 'donationTablePagination', 10);
+            }
         });
     });
 
     // Pagination function
     function paginateTable(tableId, paginationId, rowsPerPage = 10) {
         const table = document.getElementById(tableId);
+        if (!table) return;
+
         const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+
         const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.style.display !== 'none');
         const pagination = document.getElementById(paginationId);
 
-        if (rows.length === 0) return;
+        if (!pagination || rows.length === 0) return;
 
         function showPage(page) {
             const start = (page - 1) * rowsPerPage;
             const end = start + rowsPerPage;
 
-            // Hide all rows first
-            document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
-                row.style.display = 'none';
-            });
-
-            // Show only rows for current page
             rows.forEach((row, i) => {
-                if (i >= start && i < end) {
-                    row.style.display = '';
-                }
+                row.style.display = (i >= start && i < end) ? '' : 'none';
             });
         }
 
@@ -725,7 +772,7 @@ $donations = $data;
             prevA.innerHTML = '&laquo;';
             prevA.onclick = function(e) {
                 e.preventDefault();
-                const activePage = document.querySelector('.pagination .active');
+                const activePage = pagination.querySelector('.active');
                 if (activePage && activePage.previousElementSibling) {
                     activePage.previousElementSibling.querySelector('.page-link').click();
                 }
@@ -744,7 +791,7 @@ $donations = $data;
                 a.onclick = function(e) {
                     e.preventDefault();
                     showPage(i);
-                    Array.from(pagination.children).forEach(el => el.classList.remove('active'));
+                    pagination.querySelectorAll('.page-item').forEach(el => el.classList.remove('active'));
                     li.classList.add('active');
                 };
                 li.appendChild(a);
@@ -760,7 +807,7 @@ $donations = $data;
             nextA.innerHTML = '&raquo;';
             nextA.onclick = function(e) {
                 e.preventDefault();
-                const activePage = document.querySelector('.pagination .active');
+                const activePage = pagination.querySelector('.active');
                 if (activePage && activePage.nextElementSibling) {
                     activePage.nextElementSibling.querySelector('.page-link').click();
                 }
@@ -768,7 +815,10 @@ $donations = $data;
             nextLi.appendChild(nextA);
             pagination.appendChild(nextLi);
 
-            if (pagination.children.length > 0) pagination.children[1].classList.add('active');
+            // Set first page as active
+            if (pagination.children.length > 1) {
+                pagination.children[1].classList.add('active');
+            }
         }
 
         renderPagination();
@@ -777,7 +827,10 @@ $donations = $data;
 
     // Initialize pagination on page load
     document.addEventListener('DOMContentLoaded', function() {
-        paginateTable('donationTable', 'donationTablePagination', 10);
+        const tableRows = document.querySelectorAll('#donationTable tbody tr');
+        if (tableRows.length > 10 && typeof paginateTable === 'function') {
+            paginateTable('donationTable', 'donationTablePagination', 10);
+        }
     });
 </script>
 

@@ -81,9 +81,9 @@
     const enableSort = config.enableSort || false;
     const showUserLocation = config.showUserLocation || false;
 
-    const defaultLat = 12.8797,
-      defaultLng = 121.7740,
-      defaultZoom = 6;
+    const defaultLat = 10.6625,
+      defaultLng = 122.3212,
+      defaultZoom = 15;
 
     // Create map
     let map = L.map('map').setView([defaultLat, defaultLng], defaultZoom);
@@ -236,7 +236,8 @@
       try {
         map.invalidateSize();
       } catch (e) {
-        /* ignore */ }
+        /* ignore */
+      }
     }, 200);
   }
 

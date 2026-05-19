@@ -513,6 +513,37 @@ def get_disbursements(current_user):
 
     return jsonify(rows)
   
+@disbursement_bp.route('/available_funds', methods=['GET'])
+@verify_token
+def available_funds(current_user):
+
+    conn = db_conn()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT SUM(remaining_amount) AS available_funds
+            FROM temp_donations
+            WHERE donation_status = 'APPROVED'
+            AND remaining_amount > 0
+        """)
+
+        result = cursor.fetchone()
+
+        return jsonify({
+            "available_funds": float(result['available_funds'] or 0)
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+  
 
 @disbursement_bp.route('/dtest_blockchain', methods=['GET'])
 def dtest_blockchain():

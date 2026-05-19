@@ -60,6 +60,7 @@ def verify_admin_otp():
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT otp_code, otp_expiry FROM admin WHERE id = %s", (admin_id,))
     admin = cursor.fetchone()
+    
 
     if not admin:
         return jsonify({'status': 'error', 'message': 'Admin not found'})
