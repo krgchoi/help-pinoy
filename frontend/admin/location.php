@@ -1,6 +1,8 @@
 <?php
 include('./template/navbar.php');
 
+$jwt_token = $_SESSION['access_token'];
+
 $url = "http://localhost:5000/admin/get_locations";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -54,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_location'])) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Content-Type: application/json",
-        "get-token: $jwt_token"
+        "Authorization: Bearer $jwt_token"
     ]);
 
     $response = curl_exec($ch);
@@ -82,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_center'])) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Content-Type: application/json",
-        "get-token: $jwt_token"
+        "Authorization: Bearer $jwt_token"
     ]);
 
     $response = curl_exec($ch);
@@ -128,7 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Content-Type: application/json",
-        "get-token: $jwt_token"
+        "Authorization: Bearer $jwt_token"
     ]);
 
     $response = curl_exec($ch);
@@ -515,7 +517,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
                                             $typeCount = [];
                                             if (!empty($data)) {
                                                 foreach ($data as $location) {
-                                                    $type = $location['type'] ?: 'General';
+                                                    $type = $location['type'] ?: 'N/A';
                                                     if (!isset($typeCount[$type])) {
                                                         $typeCount[$type] = 0;
                                                     }

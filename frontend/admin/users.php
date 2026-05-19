@@ -1,6 +1,8 @@
 <?php
 include('./template/navbar.php');
 
+$jwt_token = $_SESSION['access_token'];
+
 // Handle delete user
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     $user_id = filter_input(INPUT_POST, 'user_id', FILTER_SANITIZE_NUMBER_INT);

@@ -33,114 +33,221 @@ PRIVATE_KEY = os.getenv('BLOCKCHAIN_PRIVATE_KEY')
 
 web3 = Web3(Web3.HTTPProvider(BLOCKCHAIN_RPC_URL))
 
-CONTRACT_ABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "hash",
-				"type": "string"
-			}
-		],
-		"name": "addDonation",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": False,
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			},
-			{
-				"indexed": False,
-				"internalType": "string",
-				"name": "hash",
-				"type": "string"
-			},
-			{
-				"indexed": False,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "DonationAdded",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			}
-		],
-		"name": "getDonation",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "hash",
-				"type": "string"
-			}
-		],
-		"name": "verifyDonation",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-]
-
 contract = web3.eth.contract(
     address=Web3.to_checksum_address(CONTRACT_ADDRESS),
-    abi=CONTRACT_ABI
+    abi= [
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "addDisbursement",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "addDonation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": False,
+    "inputs": [
+      {
+        "indexed": False,
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "indexed": False,
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      },
+      {
+        "indexed": False,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "DisbursementAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": False,
+    "inputs": [
+      {
+        "indexed": False,
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "indexed": False,
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      },
+      {
+        "indexed": False,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "DonationAdded",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      }
+    ],
+    "name": "getDisbursement",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      }
+    ],
+    "name": "getDonation",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "verifyDisbursement",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "verifyDonation",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
 )
-
-if not web3.is_connected():
-    print("❌ Blockchain connection failed")
-else:
-    print("✅ Connected to blockchain")
 
 @donation_bp.route('/donations', methods=['GET'])
 @verify_token
@@ -211,34 +318,39 @@ def update_donation_status(current_user):
     if status == "APPROVED":
 
         cursor.execute("""
-            SELECT amount, donation_date, public_id, blockchain_tx
+            SELECT amount, donation_date, public_id, blockchain_tx, donor_id
             FROM temp_donations 
             WHERE donation_id = %s
+            FOR UPDATE
         """, (donation_id,))
         result = cursor.fetchone()
 
-        if result and result.get("blockchain_tx"):
+        if not result:
+            return jsonify({"status": "error", "message": "Donation not found"}), 404
+
+        if result.get("blockchain_tx"):
             return jsonify({
                 "status": "error",
                 "message": "Already recorded on blockchain"
             }), 400
-            
-        if not result:
-            return jsonify({"status": "error", "message": "Donation not found"}), 404
 
         amount = result['amount']
         donation_date = result['donation_date']
         public_id = result['public_id']
+        donor_id = result['donor_id']
 
-        # ✅ deterministic hash
+        # initialize remaining
+        remaining_amount = amount
+
+        # deterministic hash (stronger)
         amount_str = "{:.2f}".format(float(amount))
         date_str = donation_date.strftime("%Y-%m-%dT%H:%M:%S")
         status_str = status.upper()
 
-        data_string = f"{public_id}|{amount_str}|{date_str}|{status_str}"
+        data_string = f"{public_id}|{donor_id}|{amount_str}|{date_str}|{status_str}"
         record_hash = hashlib.sha256(data_string.encode()).hexdigest()
 
-        # 🔗 write to blockchain
+        # blockchain write
         blockchain_tx = write_to_blockchain(public_id, record_hash)
 
         if not blockchain_tx:
@@ -248,16 +360,17 @@ def update_donation_status(current_user):
                 "message": "Blockchain transaction failed"
             }), 500
 
-        # ✅ update DB ONLY after success
+        # update DB
         cursor.execute("""
             UPDATE temp_donations
             SET donation_status = %s,
                 verified_at = NOW(),
                 reviewed_by = %s,
                 record_hash = %s,
-                blockchain_tx = %s
+                blockchain_tx = %s,
+                remaining_amount = %s
             WHERE donation_id = %s
-        """, (status, current_user['id'], record_hash, blockchain_tx, donation_id))
+        """, (status, current_user['id'], record_hash, blockchain_tx, remaining_amount, donation_id))
 
     elif status == "REJECTED":
         cursor.execute("""

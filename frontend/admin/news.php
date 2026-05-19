@@ -1,6 +1,9 @@
 <?php
 include('./template/navbar.php');
 
+
+$jwt_token = $_SESSION['access_token'];
+
 $url = "http://localhost:5000/admin/news";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

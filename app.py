@@ -19,6 +19,7 @@ from backend.admin.news import news_bp
 from backend.admin.centers import centers_bp
 from backend.admin.users import users_bp
 from backend.admin.auth import admin_auth_bp
+from backend.admin.disbursement import disbursement_bp
 
 app.register_blueprint(dashboard_bp, url_prefix='/admin')
 app.register_blueprint(donation_bp, url_prefix='/admin')
@@ -26,7 +27,7 @@ app.register_blueprint(news_bp, url_prefix='/admin')
 app.register_blueprint(centers_bp, url_prefix='/admin')
 app.register_blueprint(users_bp, url_prefix='/admin')
 app.register_blueprint(admin_auth_bp, url_prefix='/admin')
-
+app.register_blueprint(disbursement_bp, url_prefix='/admin')
 
 #users blueprints
 from backend.users.register import register_bp

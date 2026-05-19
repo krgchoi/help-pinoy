@@ -5,108 +5,220 @@ from backend.utils import db_conn
 
 web3 = Web3(Web3.HTTPProvider(os.getenv('BLOCKCHAIN_RPC_URL')))
 
-CONTRACT_ABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "hash",
-				"type": "string"
-			}
-		],
-		"name": "addDonation",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": False,
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			},
-			{
-				"indexed": False,
-				"internalType": "string",
-				"name": "hash",
-				"type": "string"
-			},
-			{
-				"indexed": False,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "DonationAdded",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			}
-		],
-		"name": "getDonation",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "txid",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "hash",
-				"type": "string"
-			}
-		],
-		"name": "verifyDonation",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-]
-
 contract = web3.eth.contract(
     address=Web3.to_checksum_address(os.getenv('DONATION_CONTRACT_ADDRESS')),
-    abi=CONTRACT_ABI
+    abi=[
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "addDisbursement",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "addDonation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": False,
+    "inputs": [
+      {
+        "indexed": False,
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "indexed": False,
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      },
+      {
+        "indexed": False,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "DisbursementAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": False,
+    "inputs": [
+      {
+        "indexed": False,
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "indexed": False,
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      },
+      {
+        "indexed": False,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "DonationAdded",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      }
+    ],
+    "name": "getDisbursement",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      }
+    ],
+    "name": "getDonation",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "verifyDisbursement",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "verifyDonation",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
 )
 
 def verify_donation_record(public_id):

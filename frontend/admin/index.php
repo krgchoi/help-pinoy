@@ -1,11 +1,6 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['access_token'])) {
-    header('Location: admin_login.php');
-    exit();
-}
-
 $jwt_token = $_SESSION['access_token'];
 
 // API CALL FIRST
@@ -18,30 +13,45 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
 ]);
 
 $response = curl_exec($ch);
+$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
+
+// Check for curl error or 401 Unauthorized
+if ($response === false || $http_code === 401) {
+    session_destroy();
+    header('Location: admin_logout.php');
+    exit();
+}
 
 $data = json_decode($response, true);
 
-// 🔥 Handle expired BEFORE output
-if ($data === null || (isset($data['status']) && $data['status'] === 'expire')) {
+// Check if response is valid JSON array
+if (!is_array($data)) {
     session_destroy();
-    header('Location: admin_login.php');
+    header('Location: admin_logout.php');
+    exit();
+}
+
+// Check for error status (redundant but kept for safety)
+if (isset($data['status']) && $data['status'] === 'error') {
+    session_destroy();
+    header('Location: admin_logout.php');
     exit();
 }
 
 // ✅ NOW include navbar AFTER logic
 include('./template/navbar.php');
 
-$sd = $data['sd'];
-$sd_month = $data['sd_month'];
-$td = $data['td'];
-$tu = $data['tu'];
-$dm = $data['dm'];
-$dr = $data['dr'];
-$dt = $data['dt'];
-$rd = $data['rd'];
-$tp = $data['tp'];
-$dtr = $data['dtr'];
+$sd = $data['sd'] ?? 0;
+$sd_month = $data['sd_month'] ?? 0;
+$td = $data['td'] ?? 0;
+$tu = $data['tu'] ?? 0;
+$dm = $data['dm'] ?? [];
+$dr = $data['dr'] ?? [];
+$dt = $data['dt'] ?? [];
+$rd = $data['rd'] ?? [];
+$tp = $data['tp'] ?? [];
+$dtr = $data['dtr'] ?? [];
 
 // Donation trends
 $donationMonths = [];
@@ -55,17 +65,16 @@ $donationTrendsData = array_map(function ($month, $amount) {
 }, $donationMonths, $donationAmounts);
 
 // Payment method
-// $paymentMethods = [];
-// $paymentMethodCounts = [];
-// foreach ($dm as $row) {
-//     $paymentMethods[] = htmlspecialchars($row['payment_method'], ENT_QUOTES, 'UTF-8');
-//     $paymentMethodCounts[] = (int)$row['total'];
-// }
-// $paymentMethodData = [];
-// for ($i = 0; $i < count($paymentMethods); $i++) {
-//     $paymentMethodData[] = [$paymentMethods[$i], $paymentMethodCounts[$i]];
-// }
-// 
+$paymentMethods = [];
+$paymentMethodCounts = [];
+foreach ($dm as $row) {
+    $paymentMethods[] = htmlspecialchars($row['payment_method'], ENT_QUOTES, 'UTF-8');
+    $paymentMethodCounts[] = (int)$row['total'];
+}
+$paymentMethodData = [];
+for ($i = 0; $i < count($paymentMethods); $i++) {
+    $paymentMethodData[] = [$paymentMethods[$i], $paymentMethodCounts[$i]];
+}
 ?>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
