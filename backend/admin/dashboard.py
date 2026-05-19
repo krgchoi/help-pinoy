@@ -10,15 +10,9 @@ def dashboard_data(current_user):
     conn = db_conn()
     cursor = conn.cursor(dictionary=True)
 
-    # =========================
-    # ✅ Total donations (ONLY APPROVED)
-    # =========================
     cursor.execute("SELECT SUM(amount) AS total FROM temp_donations WHERE donation_status = 'APPROVED'")
     sd = cursor.fetchone()['total'] or 0
 
-    # =========================
-    # ✅ Total donations for this month
-    # =========================
     cursor.execute("""
         SELECT SUM(amount) AS total 
         FROM temp_donations 
@@ -28,9 +22,6 @@ def dashboard_data(current_user):
     """)
     sd_month = cursor.fetchone()['total'] or 0
 
-    # =========================
-    # ✅ Total unique donors (approved only)
-    # =========================
     cursor.execute("""
         SELECT COUNT(DISTINCT donor_id) AS dontotal 
         FROM temp_donations 
@@ -39,15 +30,9 @@ def dashboard_data(current_user):
     """)
     td = cursor.fetchone()['dontotal'] or 0
 
-    # =========================
-    # ✅ Total users (no change)
-    # =========================
     cursor.execute("SELECT COUNT(*) AS total FROM users")
     tu = cursor.fetchone()['total'] or 0
 
-    # =========================
-    # ❌ REMOVE THIS (no payment system anymore)
-    # =========================
     # cursor.execute("""
     #     SELECT payment_method, COUNT(*) AS total 
     #     FROM donations 
@@ -56,11 +41,8 @@ def dashboard_data(current_user):
     # """)
     # dm = cursor.fetchall()
 
-    dm = []  # keep empty so frontend won't break
+    dm = [] 
 
-    # =========================
-    # 🔁 Donation status distribution
-    # =========================
     cursor.execute("""
         SELECT donation_status, COUNT(*) AS count 
         FROM temp_donations 
@@ -68,9 +50,6 @@ def dashboard_data(current_user):
     """)
     dr = cursor.fetchall()
 
-    # =========================
-    # 🔁 Donation trends (APPROVED only)
-    # =========================
     cursor.execute("""
         SELECT DATE_FORMAT(donation_date, '%Y-%m') AS month, SUM(amount) AS total_donations
         FROM temp_donations 
@@ -81,9 +60,6 @@ def dashboard_data(current_user):
     """)
     dt = cursor.fetchall()
 
-    # =========================
-    # 🔁 Recent donations (ALL statuses)
-    # =========================
     cursor.execute("""
         SELECT full_name, email, amount, donation_status, donation_date 
         FROM temp_donations 
@@ -100,9 +76,7 @@ def dashboard_data(current_user):
             donation['full_name'] = donation['full_name'] or "N/A"
             donation['email'] = donation['email'] or "N/A"
 
-    # =========================
-    # 🔁 Top donors (APPROVED only)
-    # =========================
+
     cursor.execute("""
         SELECT full_name, SUM(amount) AS total 
         FROM temp_donations 
@@ -119,9 +93,6 @@ def dashboard_data(current_user):
         except:
             donor['full_name'] = donor['full_name'] or "N/A"
 
-    # =========================
-    # 🔁 Donation trends (monthly view)
-    # =========================
     cursor.execute("""
         SELECT DATE_FORMAT(donation_date, '%M') AS month, SUM(amount) AS total_donations
         FROM temp_donations 
@@ -132,9 +103,6 @@ def dashboard_data(current_user):
     """)
     dtr = cursor.fetchall()
 
-    # =========================
-    # 🔁 Status counters
-    # =========================
     cursor.execute("SELECT COUNT(*) AS total FROM temp_donations WHERE donation_status = 'PENDING'")
     pending_total = cursor.fetchone()['total'] or 0
 
@@ -144,8 +112,6 @@ def dashboard_data(current_user):
     cursor.execute("SELECT COUNT(*) AS total FROM temp_donations WHERE donation_status = 'REJECTED'")
     rejected_total = cursor.fetchone()['total'] or 0
 
-    # ❌ REMOVE EXPIRED (no longer exists)
-    # expired_total = ...
 
     cursor.close()
     conn.close()
@@ -155,7 +121,7 @@ def dashboard_data(current_user):
         'sd_month': sd_month,
         'td': td,
         'tu': tu,
-        'dm': dm,  # now empty
+        'dm': dm,  #empty
         'dr': dr,
         'dt': dt,
         'rd': rd,
