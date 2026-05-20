@@ -85,7 +85,7 @@
       defaultLng = 122.3212,
       defaultZoom = 15;
 
-    // Create map
+
     let map = L.map('map').setView([defaultLat, defaultLng], defaultZoom);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

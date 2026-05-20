@@ -8,9 +8,6 @@ if (!$jwt_token) {
     exit();
 }
 
-// =========================
-// FETCH LOCATIONS
-// =========================
 $url = "http://localhost:5000/admin/get_locations";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -39,9 +36,7 @@ if (isset($data['status']) && $data['status'] === 'expire') {
 
 $locations = is_array($data) ? $data : [];
 
-// =========================
-// ADD LOCATION
-// =========================
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_location'])) {
     $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $address = filter_input(INPUT_POST, 'address', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -89,9 +84,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_location'])) {
     }
 }
 
-// =========================
-// DELETE LOCATION
-// =========================
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_center'])) {
     $location_id = filter_input(INPUT_POST, 'location_id', FILTER_SANITIZE_NUMBER_INT);
 
@@ -123,9 +115,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_center'])) {
     }
 }
 
-// =========================
-// EDIT LOCATION
-// =========================
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_location'])) {
     $location_id = filter_input(INPUT_POST, 'location_id', FILTER_SANITIZE_NUMBER_INT);
     $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -885,12 +874,12 @@ foreach ($locations as $location) {
 <?php endif; ?>
 
 <script>
-    // Confirm delete function
+    // Confirm delete
     function confirmDelete() {
         return confirm('Are you sure you want to delete this donation center? This action cannot be undone.');
     }
 
-    // Search functionality
+    // Search
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keyup', function() {
@@ -909,14 +898,12 @@ foreach ($locations as $location) {
                 if (isVisible) visibleCount++;
             });
 
-            // Update pagination after filtering
             if (visibleCount > 0 && typeof paginateTable === 'function') {
                 paginateTable('locationTable', 'locationTablePagination', 10);
             }
         });
     }
 
-    // Filter functionality
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -940,7 +927,6 @@ foreach ($locations as $location) {
         });
     });
 
-    // Pagination function
     function paginateTable(tableId, paginationId, rowsPerPage = 10) {
         const table = document.getElementById(tableId);
         if (!table) return;

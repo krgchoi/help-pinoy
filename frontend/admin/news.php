@@ -8,9 +8,6 @@ if (!$jwt_token) {
     exit();
 }
 
-// =========================
-// FETCH NEWS
-// =========================
 $url = "http://localhost:5000/admin/news";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -38,9 +35,7 @@ if (isset($data['status']) && $data['status'] === 'expire') {
 
 $news_articles = is_array($data) ? $data : [];
 
-// =========================
-// ADD NEWS
-// =========================
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_news'])) {
     $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $content = filter_input(INPUT_POST, 'content', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -52,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_news'])) {
     $meta_description = filter_input(INPUT_POST, 'meta_description', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $slug = filter_input(INPUT_POST, 'slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-    // Handle image upload
+    // image upload
     $image_url = '';
     if (isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK) {
         $ch = curl_init('http://localhost:5000/admin/upload_news_image');
@@ -107,9 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_news'])) {
     }
 }
 
-// =========================
-// DELETE NEWS
-// =========================
 if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['delete_news'])) {
     $news_id = filter_input(INPUT_POST, 'news_id', FILTER_SANITIZE_NUMBER_INT);
 
@@ -141,9 +133,6 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['delete_news'])) {
     }
 }
 
-// =========================
-// UPDATE NEWS
-// =========================
 if ($_SERVER["REQUEST_METHOD"] == 'POST' && isset($_POST['update_news'])) {
     $news_id = filter_input(INPUT_POST, 'news_id', FILTER_SANITIZE_NUMBER_INT);
     $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -232,7 +221,6 @@ foreach ($news_articles as $news) {
 }
 ?>
 
-<!-- Page specific CSS -->
 <style>
     :root {
         --primary-color: #0057b7;

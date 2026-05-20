@@ -8,9 +8,6 @@ if (!$jwt_token) {
     exit();
 }
 
-// =========================
-// CREATE DISBURSEMENT
-// =========================
 $create_message = '';
 $create_message_type = '';
 
@@ -52,9 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create_disbursement'])
     }
 }
 
-// =========================
-// FETCH DISBURSEMENTS
-// =========================
 $ch = curl_init("http://localhost:5000/admin/disbursements");
 
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -111,9 +105,7 @@ foreach ($disbursements as $d) {
     $totalDisbursed += floatval($d['total_amount']);
 }
 
-// =========================
-// AVAILABLE FUNDS
-// =========================
+
 $availablefunds = 0;
 
 $ch = curl_init("http://localhost:5000/admin/available_funds");
@@ -133,9 +125,7 @@ if (isset($fundData['available_funds'])) {
     $availablefunds = floatval($fundData['available_funds']);
 }
 
-// =========================
-// COMPLETED PROJECTS
-// =========================
+
 $completedProjects = 0;
 
 foreach ($disbursements as $d) {
@@ -148,9 +138,7 @@ foreach ($disbursements as $d) {
 }
 ?>
 
-<!-- Page specific CSS (scoped to this page only) -->
 <style>
-    /* Page-specific styles that won't conflict with admin.css */
     .stats-card {
         background: white;
         border-radius: 12px;

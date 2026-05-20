@@ -25,21 +25,18 @@ if ($response === false || $http_code === 401) {
 
 $data = json_decode($response, true);
 
-// Check if response is valid JSON array
 if (!is_array($data)) {
     session_destroy();
     header('Location: admin_logout.php');
     exit();
 }
 
-// Check for error status (redundant but kept for safety)
 if (isset($data['status']) && $data['status'] === 'error') {
     session_destroy();
     header('Location: admin_logout.php');
     exit();
 }
 
-// ✅ NOW include navbar AFTER logic
 include('./template/navbar.php');
 
 $sd = $data['sd'] ?? 0;
@@ -62,7 +59,6 @@ echo "<pre>";
 print_r($pending_total);
 echo "</pre>";
 
-// Donation trends
 $donationMonths = [];
 $donationAmounts = [];
 foreach ($dtr as $row) {

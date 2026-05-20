@@ -34,7 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_status'])) {
 
 $donations = is_array($data) ? $data : [];
 
-// Calculate statistics
 $totalAmount = 0;
 $totalDonations = count($donations);
 $approvedCount = 0;
@@ -56,7 +55,6 @@ foreach ($donations as $donation) {
 }
 ?>
 
-<!-- Page specific CSS -->
 <style>
     :root {
         --primary-color: #0057b7;
